@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { validateAndFixProject, type Project as AgentProject } from "./agent";
+import { parseFileToProjects } from "./importers";
 
 const skills = ["CNC", "Build", "Paint", "AV", "Pack & Load"] as const;
 type Skill = typeof skills[number];
