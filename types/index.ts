@@ -1,5 +1,7 @@
 import { RowDoc } from "@/models/Row";
-import { SheetSlug } from "@/configs/sheets";
+
+// Sheet types
+export type SheetSlug = 'capacity' | 'demand' | 'supply' | 'projects' | 'staff';
 
 // API Response types
 export interface ApiResponse<T = any> {
@@ -28,12 +30,12 @@ export interface CreateRowRequest {
 }
 
 export interface UpdateRowRequest {
-  id: string;
+  _id: string;
   changes: Record<string, any>;
 }
 
 export interface DeleteRowRequest {
-  id: string;
+  _id: string;
 }
 
 // Sync types
@@ -48,9 +50,7 @@ export interface SyncResponse {
 }
 
 // DataGrid types
-export interface DataGridRow extends ApiRow {
-  id: string;
-}
+export interface DataGridRow extends ApiRow {}
 
 // Sheet configuration types
 export interface SheetConfig {

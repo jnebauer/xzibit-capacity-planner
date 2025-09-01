@@ -7,7 +7,7 @@ export async function GET() {
     await dbConnect();
     
     // Get all staff
-    const staff = await Staff.find({}).sort({ id: 1 });
+    const staff = await Staff.find({}).sort({ createdAt: -1 });
     
     return NextResponse.json(staff.map(s => s.toObject()));
     

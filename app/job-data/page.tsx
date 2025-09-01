@@ -31,7 +31,7 @@ import {
   Button,
   Snackbar
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 
 export default function JobData() {
   const queryClient = useQueryClient();
@@ -43,6 +43,8 @@ export default function JobData() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<any>(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as any });
+  
+
 
   const { data: projectsData, isLoading: projectsLoading, error: projectsError } = useQuery({
     queryKey: ['projects'],
@@ -104,6 +106,8 @@ export default function JobData() {
       setSnackbar({ open: true, message: 'Failed to create project', severity: 'error' });
     },
   });
+
+  const isSaving = (updateProjectMutation as any)?.isPending || (createProjectMutation as any)?.isPending;
 
   const deleteProjectMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -177,6 +181,24 @@ export default function JobData() {
       headerName: "Project Name",
       width: 250,
       editable: true,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            cursor: 'pointer',
+            color: '#667eea',
+            fontWeight: 500,
+            '&:hover': {
+              textDecoration: 'underline',
+              color: '#5a6fd8'
+            }
+          }}
+          onClick={() => {
+            window.location.href = `/job-data/${params.row._id}`;
+          }}
+        >
+          {params.value || 'Unnamed Project'}
+        </Box>
+      ),
     },
     {
       field: "projectType",
@@ -333,8 +355,15 @@ export default function JobData() {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      width: 100,
+      width: 150,
       getActions: (params) => [
+        <GridActionsCellItem
+          icon={<VisibilityIcon />}
+          label="View"
+          onClick={() => {
+            window.location.href = `/job-data/${params.row._id}`;
+          }}
+        />,
         <GridActionsCellItem
           icon={<EditIcon />}
           label="Edit"
@@ -422,6 +451,7 @@ export default function JobData() {
             <DataGrid
               rows={rows}
               columns={columns}
+              getRowId={(row) => row._id}
               loading={projectsLoading}
               pagination
               paginationModel={paginationModel}
@@ -595,6 +625,7 @@ export default function JobData() {
           <Button 
             onClick={handleSave} 
             variant="contained"
+            disabled={isSaving}
             sx={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               '&:hover': {
@@ -602,10 +633,12 @@ export default function JobData() {
               }
             }}
           >
-            Save
+            {isSaving ? <><CircularProgress size={18} sx={{ mr: 1, color: 'white' }} /> Saving...</> : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>
+
+
 
       {/* Snackbar */}
       <Snackbar

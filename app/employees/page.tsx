@@ -30,9 +30,13 @@ import {
   Button,
   Snackbar,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
+  Chip,
+  Paper,
+  Divider,
+  IconButton
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Visibility as VisibilityIcon, Person as PersonIcon, Close as CloseIcon } from '@mui/icons-material';
 
 export default function Employees() {
   const queryClient = useQueryClient();
@@ -97,6 +101,8 @@ export default function Employees() {
     },
   });
 
+  const isSaving = (updateStaffMutation as any)?.isPending || (createStaffMutation as any)?.isPending;
+
   const deleteStaffMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(`/api/staff/${id}`, {
@@ -156,6 +162,24 @@ export default function Employees() {
       headerName: "Name",
       width: 200,
       editable: true,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            cursor: 'pointer',
+            color: '#667eea',
+            fontWeight: 500,
+            '&:hover': {
+              textDecoration: 'underline',
+              color: '#5a6fd8'
+            }
+          }}
+          onClick={() => {
+            window.location.href = `/employees/${params.row._id}`;
+          }}
+        >
+          {params.value || 'Unnamed Employee'}
+        </Box>
+      ),
     },
     {
       field: "dailyHours",
@@ -279,8 +303,15 @@ export default function Employees() {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      width: 100,
+      width: 150,
       getActions: (params) => [
+        <GridActionsCellItem
+          icon={<VisibilityIcon />}
+          label="View"
+          onClick={() => {
+            window.location.href = `/employees/${params.row._id}`;
+          }}
+        />,
         <GridActionsCellItem
           icon={<EditIcon />}
           label="Edit"
@@ -360,6 +391,7 @@ export default function Employees() {
             <DataGrid
               rows={rows}
               columns={columns}
+              getRowId={(row) => row._id}
               loading={staffLoading}
               pagination
               paginationModel={paginationModel}
@@ -469,6 +501,7 @@ export default function Employees() {
           <Button 
             onClick={handleSave} 
             variant="contained"
+            disabled={isSaving}
             sx={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               '&:hover': {
@@ -476,7 +509,7 @@ export default function Employees() {
               }
             }}
           >
-            Save
+            {isSaving ? <><CircularProgress size={18} sx={{ mr: 1, color: 'white' }} /> Saving...</> : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>

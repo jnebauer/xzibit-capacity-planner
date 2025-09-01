@@ -1,10 +1,4 @@
 {
-  "crons": [
-    {
-      "path": "/api/sync/pull",
-      "schedule": "0 */6 * * *"
-    }
-  ],
   "functions": {
     "app/api/sync/pull/route.ts": {
       "maxDuration": 300

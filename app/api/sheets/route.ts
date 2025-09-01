@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
-import { SHEETS } from "@/configs/sheets";
+
 
 export async function GET() {
   try {
     return NextResponse.json({ 
       ok: true, 
-      data: SHEETS 
+      data: [
+        { name: 'Capacity', slug: 'capacity', description: 'Capacity planning data' },
+        { name: 'Demand', slug: 'demand', description: 'Demand forecasting data' },
+        { name: 'Supply', slug: 'supply', description: 'Supply planning data' },
+        { name: 'Projects', slug: 'projects', description: 'Project management data' },
+        { name: 'Staff', slug: 'staff', description: 'Staff allocation data' }
+      ]
     });
   } catch (error) {
     return NextResponse.json(

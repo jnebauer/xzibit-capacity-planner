@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { sheetBySlug } from "@/configs/sheets";
+
 import Row from "@/models/Row";
 import { dbConnect } from "@/lib/mongo";
 
@@ -10,12 +10,12 @@ const createRowSchema = z.object({
 });
 
 const updateRowSchema = z.object({
-  id: z.string(),
+  _id: z.string(),
   changes: z.record(z.any())
 });
 
 const deleteRowSchema = z.object({
-  id: z.string()
+  _id: z.string()
 });
 
 export async function GET(
@@ -25,8 +25,9 @@ export async function GET(
   try {
     await dbConnect();
     
-    const sheetCfg = sheetBySlug(params.sheet);
-    if (!sheetCfg) {
+    // Validate sheet parameter
+    const validSheets = ['capacity', 'demand', 'supply', 'projects', 'staff'];
+    if (!validSheets.includes(params.sheet)) {
       return NextResponse.json(
         { ok: false, error: "Unknown sheet" },
         { status: 404 }
@@ -38,13 +39,13 @@ export async function GET(
     const limit = parseInt(searchParams.get("limit") || "100");
     const skip = (page - 1) * limit;
 
-    const rows = await Row.find({ sheet: sheetCfg.slug })
+    const rows = await Row.find({ sheet: params.sheet })
       .sort({ rowNumber: 1, createdAt: 1 })
       .skip(skip)
       .limit(limit)
       .lean();
 
-    const total = await Row.countDocuments({ sheet: sheetCfg.slug });
+    const total = await Row.countDocuments({ sheet: params.sheet });
 
     return NextResponse.json({
       ok: true,
@@ -71,8 +72,9 @@ export async function POST(
   try {
     await dbConnect();
     
-    const sheetCfg = sheetBySlug(params.sheet);
-    if (!sheetCfg) {
+    // Validate sheet parameter
+    const validSheets = ['capacity', 'demand', 'supply', 'projects', 'staff'];
+    if (!validSheets.includes(params.sheet)) {
       return NextResponse.json(
         { ok: false, error: "Unknown sheet" },
         { status: 404 }
@@ -83,7 +85,7 @@ export async function POST(
     const validated = createRowSchema.parse(body);
 
     const row = await Row.create({
-      sheet: sheetCfg.slug,
+      sheet: params.sheet,
       data: validated.data,
       synced: false
     });
@@ -111,8 +113,9 @@ export async function PATCH(
   try {
     await dbConnect();
     
-    const sheetCfg = sheetBySlug(params.sheet);
-    if (!sheetCfg) {
+    // Validate sheet parameter
+    const validSheets = ['capacity', 'demand', 'supply', 'projects', 'staff'];
+    if (!validSheets.includes(params.sheet)) {
       return NextResponse.json(
         { ok: false, error: "Unknown sheet" },
         { status: 404 }
@@ -128,7 +131,7 @@ export async function PATCH(
     });
 
     const row = await Row.findByIdAndUpdate(
-      validated.id,
+      validated._id,
       { $set: updateData },
       { new: true }
     );
@@ -163,8 +166,9 @@ export async function DELETE(
   try {
     await dbConnect();
     
-    const sheetCfg = sheetBySlug(params.sheet);
-    if (!sheetCfg) {
+    // Validate sheet parameter
+    const validSheets = ['capacity', 'demand', 'supply', 'projects', 'staff'];
+    if (!validSheets.includes(params.sheet)) {
       return NextResponse.json(
         { ok: false, error: "Unknown sheet" },
         { status: 404 }
@@ -174,7 +178,7 @@ export async function DELETE(
     const body = await request.json();
     const validated = deleteRowSchema.parse(body);
 
-    const row = await Row.findById(validated.id);
+    const row = await Row.findById(validated._id);
     if (!row) {
       return NextResponse.json(
         { ok: false, error: "Row not found" },
@@ -186,10 +190,10 @@ export async function DELETE(
     if (row.rowNumber) {
       // Note: This would require additional implementation for Google Sheets deletion
       // For now, we'll just delete from MongoDB
-      console.log(`Row ${row.rowNumber} in sheet ${sheetCfg.name} should be deleted from Google Sheets`);
+      console.log(`Row ${row.rowNumber} in sheet ${params.sheet} should be deleted from Google Sheets`);
     }
 
-    await Row.findByIdAndDelete(validated.id);
+    await Row.findByIdAndDelete(validated._id);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

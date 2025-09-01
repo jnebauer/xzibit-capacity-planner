@@ -7,7 +7,7 @@ export async function GET() {
     await dbConnect();
     
     // Get all projects
-    const projects = await Project.find({}).sort({ id: 1 });
+    const projects = await Project.find({}).sort({ createdAt: -1 });
     
     return NextResponse.json(projects.map(p => p.toObject()));
     

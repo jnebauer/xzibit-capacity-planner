@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IProject extends Document {
-  id: string;
   name: string;
   truckDate: string | null;
   weeksBefore: number;
@@ -24,11 +23,6 @@ export interface IProject extends Document {
 }
 
 const ProjectSchema = new Schema<IProject>({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   name: {
     type: String,
     required: true,

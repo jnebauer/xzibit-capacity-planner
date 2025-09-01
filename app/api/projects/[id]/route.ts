@@ -2,6 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongo";
 import Project from "@/models/Project";
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await dbConnect();
+
+    const project = await Project.findById(params.id);
+
+    if (!project) {
+      return NextResponse.json(
+        { error: "Project not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(project.toObject());
+    
+  } catch (error) {
+    console.error('Error fetching project:', error);
+    return NextResponse.json(
+      { error: "Failed to fetch project" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -10,8 +37,8 @@ export async function PATCH(
     const body = await request.json();
     await dbConnect();
 
-    const project = await Project.findOneAndUpdate(
-      { id: params.id },
+    const project = await Project.findByIdAndUpdate(
+      params.id,
       body,
       { new: true, runValidators: true }
     );
@@ -41,7 +68,7 @@ export async function DELETE(
   try {
     await dbConnect();
 
-    const project = await Project.findOneAndDelete({ id: params.id });
+    const project = await Project.findByIdAndDelete(params.id);
 
     if (!project) {
       return NextResponse.json(
