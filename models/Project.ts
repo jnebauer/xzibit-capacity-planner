@@ -17,6 +17,7 @@ export interface IProject extends Document {
     weeks: number;
   };
   projectType?: string | null;
+  jobType?: mongoose.Types.ObjectId;
   curveMode?: 'Mathematician' | 'Linear' | 'Triangular';
   createdAt: Date;
   updatedAt: Date;
@@ -52,6 +53,11 @@ const ProjectSchema = new Schema<IProject>({
   },
   projectType: {
     type: String,
+    default: null,
+  },
+  jobType: {
+    type: Schema.Types.ObjectId,
+    ref: 'JobType',
     default: null,
   },
   curveMode: {

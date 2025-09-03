@@ -103,3 +103,51 @@ export interface SnackbarState {
   message: string;
   severity: SnackbarSeverity;
 }
+
+// JobType types
+export interface JobType {
+  _id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateJobTypeRequest {
+  name: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateJobTypeRequest {
+  _id: string;
+  name: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+// Project types
+export interface Project {
+  _id: string;
+  name: string;
+  truckDate?: string;
+  weeksBefore: number;
+  hoursBySkill: {
+    CNC: number;
+    Build: number;
+    Paint: number;
+    AV: number;
+    'Pack & Load': number;
+  };
+  probability?: number;
+  onsite?: {
+    hours: number;
+    weeks: number;
+  };
+  projectType?: string;
+  jobType?: string; // Reference to JobType _id
+  curveMode?: 'Mathematician' | 'Linear' | 'Triangular';
+  createdAt: Date;
+  updatedAt: Date;
+}

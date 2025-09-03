@@ -69,7 +69,8 @@ export default function Employees() {
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<any>(null);
   const [selectedStaffForLeave, setSelectedStaffForLeave] = useState<any>(null);
-  const [newLeaveDate, setNewLeaveDate] = useState<Dayjs | null>(dayjs());
+  const [newLeaveStartDate, setNewLeaveStartDate] = useState<Dayjs | null>(dayjs());
+  const [newLeaveEndDate, setNewLeaveEndDate] = useState<Dayjs | null>(dayjs());
   const [newLeaveType, setNewLeaveType] = useState('Annual');
   const [newLeaveNotes, setNewLeaveNotes] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as any });
@@ -141,7 +142,8 @@ export default function Employees() {
       setSnackbar({ open: true, message: 'Leave added successfully', severity: 'success' });
       setLeaveDialogOpen(false);
       setSelectedStaffForLeave(null);
-      setNewLeaveDate(dayjs());
+      setNewLeaveStartDate(dayjs());
+      setNewLeaveEndDate(dayjs());
       setNewLeaveType('Annual');
       setNewLeaveNotes('');
     },
@@ -233,10 +235,10 @@ export default function Employees() {
   };
 
   const handleAddLeave = () => {
-    if (!newLeaveDate || !selectedStaffForLeave) return;
+    if (!newLeaveStartDate || !newLeaveEndDate || !selectedStaffForLeave) return;
     
-    // Validate date is not in the past
-    if (newLeaveDate.isBefore(dayjs(), 'day')) {
+    // Validate start date is not in the past
+    if (newLeaveStartDate.isBefore(dayjs(), 'day')) {
       setSnackbar({ 
         open: true, 
         message: 'Cannot add leave dates in the past', 
@@ -245,15 +247,68 @@ export default function Employees() {
       return;
     }
     
-    const leaveData = {
-      date: newLeaveDate.format('YYYY-MM-DD'),
-      leaveType: newLeaveType,
-      notes: newLeaveNotes
-    };
-
-    addLeaveMutation.mutate({
-      staffId: selectedStaffForLeave._id,
-      leaveData
+    // Validate end date is not before start date
+    if (newLeaveEndDate.isBefore(newLeaveStartDate, 'day')) {
+      setSnackbar({ 
+        open: true, 
+        message: 'End date must be after start date', 
+        severity: 'warning' 
+      });
+      return;
+    }
+    
+    // Calculate the number of days in the range
+    const daysDiff = newLeaveEndDate.diff(newLeaveStartDate, 'day') + 1;
+    
+    if (daysDiff > 30) {
+      setSnackbar({ 
+        open: true, 
+        message: 'Cannot add more than 30 days of leave at once', 
+        severity: 'warning' 
+      });
+      return;
+    }
+    
+    // Create leave data for each day in the range
+    const leaveDataArray = [];
+    let currentDate = newLeaveStartDate;
+    
+    while (currentDate.isSame(newLeaveEndDate, 'day') || currentDate.isBefore(newLeaveEndDate, 'day')) {
+      // Skip weekends (Saturday = 6, Sunday = 0)
+      if (currentDate.day() !== 0 && currentDate.day() !== 6) {
+        leaveDataArray.push({
+          date: currentDate.format('YYYY-MM-DD'),
+          leaveType: newLeaveType,
+          notes: newLeaveNotes
+        });
+      }
+      currentDate = currentDate.add(1, 'day');
+    }
+    
+    if (leaveDataArray.length === 0) {
+      setSnackbar({ 
+        open: true, 
+        message: 'No working days in the selected date range', 
+        severity: 'warning' 
+      });
+      return;
+    }
+    
+    // Add leave for each day in the range
+    leaveDataArray.forEach((leaveData, index) => {
+      setTimeout(() => {
+        addLeaveMutation.mutate({
+          staffId: selectedStaffForLeave._id,
+          leaveData
+        });
+      }, index * 100); // Small delay between requests to avoid overwhelming the API
+    });
+    
+    // Show success message
+    setSnackbar({ 
+      open: true, 
+      message: `Adding ${leaveDataArray.length} days of leave from ${newLeaveStartDate.format('DD/MM/YYYY')} to ${newLeaveEndDate.format('DD/MM/YYYY')}`, 
+      severity: 'info' 
     });
   };
 
@@ -754,25 +809,43 @@ export default function Employees() {
 
               {/* Add New Leave */}
               <Box>
-                <Typography variant="h6" sx={{ mb: 2 }}>Add New Leave Day</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}>Add Leave Range</Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
-                        label="Leave Date"
-                        value={newLeaveDate}
-                        onChange={(date) => setNewLeaveDate(date)}
+                        label="Start Date"
+                        value={newLeaveStartDate}
+                        onChange={(date) => setNewLeaveStartDate(date)}
+                        format="DD/MM/YYYY"
                         slotProps={{
                           textField: {
                             fullWidth: true,
                             size: "small",
-                            helperText: "Select a future date"
+                            helperText: "Select start date"
                           }
                         }}
                       />
                     </LocalizationProvider>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="End Date"
+                        value={newLeaveEndDate}
+                        format="DD/MM/YYYY"
+                        onChange={(date) => setNewLeaveEndDate(date)}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            size: "small",
+                            helperText: "Select end date"
+                          }
+                        }}
+                      />
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={12} md={3}>
                     <FormControl fullWidth size="small">
                       <InputLabel>Leave Type</InputLabel>
                       <Select
@@ -786,7 +859,7 @@ export default function Employees() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <TextField
                       label="Notes (Optional)"
                       value={newLeaveNotes}
@@ -801,7 +874,7 @@ export default function Employees() {
                   <Button
                     variant="contained"
                     onClick={handleAddLeave}
-                    disabled={!newLeaveDate}
+                    disabled={!newLeaveStartDate || !newLeaveEndDate}
                     sx={{
                       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                       color: 'white',
@@ -810,12 +883,12 @@ export default function Employees() {
                       }
                     }}
                   >
-                    Add Leave Day
+                    Add Leave Range
                   </Button>
                   <Typography variant="caption" color="text.secondary">
-                    {newLeaveDate && newLeaveDate.isAfter(dayjs(), 'day') 
-                      ? `Adding leave for ${newLeaveDate.format('DD/MM/YYYY')}`
-                      : 'Select a future date to add leave'
+                    {newLeaveStartDate && newLeaveEndDate && newLeaveStartDate.isAfter(dayjs(), 'day') 
+                      ? `Adding leave from ${newLeaveStartDate.format('DD/MM/YYYY')} to ${newLeaveEndDate.format('DD/MM/YYYY')} (excluding weekends)`
+                      : 'Select start and end dates to add leave range'
                     }
                   </Typography>
                 </Box>
