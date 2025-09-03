@@ -199,7 +199,7 @@ export async function POST() {
           jobName: jobName, // Column 1: Job Name
           jobType: jobTypeId, // Column 2: MUST FILL Job Type
           truckLoadDate: truckLoadDate, // Column 3: MUST FILL Truck Load Date
-          weeksToBuild: Number(weeksToBuild) || 4, // Column 4: Weeks to Build in Wkshop
+          weeksToBuild: Number(weeksToBuild) || 0, // Column 4: Weeks to Build in Wkshop
           status: status || null, // Column 5: Status field
           probability: probability ? Number(String(probability).replace('%', '')) / 100 : null, // Column 6: Probability
           // Individual skill columns
