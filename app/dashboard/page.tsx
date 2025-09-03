@@ -245,6 +245,24 @@ export default function Dashboard() {
     setEndDate(calculatedEndDate);
   }, [calculatedStartDate, calculatedEndDate]);
 
+  // Update calculated dates when manual date picker changes
+  useEffect(() => {
+    // Only update if dates are manually changed (not from filter)
+    if (startDate && endDate) {
+      // Check if dates match the calculated filter dates
+      const isNextFilter = startDate.isSame(dayjs().subtract(1, "week"), 'day') && 
+                          endDate.isSame(dayjs().add(12, "month"), 'day');
+      const isPreviousFilter = startDate.isSame(dayjs().subtract(12, "month"), 'day') && 
+                              endDate.isSame(dayjs().subtract(1, "week"), 'day');
+      
+      if (isNextFilter && dateRangeFilter !== 'next') {
+        setDateRangeFilter('next');
+      } else if (isPreviousFilter && dateRangeFilter !== 'previous') {
+        setDateRangeFilter('previous');
+      }
+    }
+  }, [startDate, endDate]);
+
   // Fetch data
   const { data: projectsData, isLoading: projectsLoading, error: projectsError } = useQuery({
     queryKey: ["projects"],
@@ -284,8 +302,8 @@ export default function Dashboard() {
 
   // Generate timeline weeks
   const weeks = useMemo(() => {
-    return generateTimelineWeeks(calculatedStartDate.toDate(), calculatedEndDate.toDate());
-  }, [calculatedStartDate, calculatedEndDate]);
+    return generateTimelineWeeks(startDate.toDate(), endDate.toDate());
+  }, [startDate, endDate]);
 
   // Calculate demand and capacity
   const demand = useMemo(() => {
@@ -442,54 +460,80 @@ export default function Dashboard() {
               />
             </Box>
 
-            {/* Date Range Filter */}
-            <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 1 }}>
-                Date Range
-              </Typography>
-              <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                <Button
-                  size="small"
-                  variant={dateRangeFilter === 'next' ? "contained" : "outlined"}
-                  onClick={() => setDateRangeFilter('next')}
-                  sx={{
-                    color: dateRangeFilter === 'next' ? "white" : "rgba(255,255,255,0.9)",
-                    backgroundColor: dateRangeFilter === 'next' ? "rgba(255,255,255,0.2)" : "transparent",
-                    borderColor: "rgba(255,255,255,0.3)",
-                    fontSize: "0.7rem",
-                    py: 0.5,
-                    px: 1,
-                    minWidth: "auto",
-                    "&:hover": {
-                      borderColor: "white",
-                      backgroundColor: dateRangeFilter === 'next' ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)",
-                    }
-                  }}
-                >
-                  Next 12M
-                </Button>
-                <Button
-                  size="small"
-                  variant={dateRangeFilter === 'previous' ? "contained" : "outlined"}
-                  onClick={() => setDateRangeFilter('previous')}
-                  sx={{
-                    color: dateRangeFilter === 'previous' ? "white" : "rgba(255,255,255,0.9)",
-                    backgroundColor: dateRangeFilter === 'previous' ? "rgba(255,255,255,0.2)" : "transparent",
-                    borderColor: "rgba(255,255,255,0.3)",
-                    fontSize: "0.7rem",
-                    py: 0.5,
-                    px: 1,
-                    minWidth: "auto",
-                    "&:hover": {
-                      borderColor: "white",
-                      backgroundColor: dateRangeFilter === 'previous' ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)",
-                    }
-                  }}
-                >
-                  Previous 12M
-                </Button>
-              </Box>
-            </Box>
+                         {/* Date Range Filter */}
+             <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+               <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 1 }}>
+                 Date Range
+               </Typography>
+               <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center", flexDirection: "column" }}>
+                 <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
+                   <Button
+                     size="small"
+                     variant={dateRangeFilter === 'next' ? "contained" : "outlined"}
+                     onClick={() => setDateRangeFilter('next')}
+                     sx={{
+                       color: dateRangeFilter === 'next' ? "white" : "rgba(255,255,255,0.9)",
+                       backgroundColor: dateRangeFilter === 'next' ? "rgba(255,255,255,0.2)" : "transparent",
+                       borderColor: "rgba(255,255,255,0.3)",
+                       fontSize: "0.7rem",
+                       py: 0.5,
+                       px: 1,
+                       minWidth: "auto",
+                       "&:hover": {
+                         borderColor: "white",
+                         backgroundColor: dateRangeFilter === 'next' ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)",
+                       }
+                     }}
+                   >
+                     Next 12M
+                   </Button>
+                   <Button
+                     size="small"
+                     variant={dateRangeFilter === 'previous' ? "contained" : "outlined"}
+                     onClick={() => setDateRangeFilter('previous')}
+                     sx={{
+                       color: dateRangeFilter === 'previous' ? "white" : "rgba(255,255,255,0.9)",
+                       backgroundColor: dateRangeFilter === 'previous' ? "rgba(255,255,255,0.2)" : "transparent",
+                       borderColor: "rgba(255,255,255,0.3)",
+                       fontSize: "0.7rem",
+                       py: 0.5,
+                       px: 1,
+                       minWidth: "auto",
+                       "&:hover": {
+                         borderColor: "white",
+                         backgroundColor: dateRangeFilter === 'previous' ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)",
+                       }
+                     }}
+                   >
+                     Previous 12M
+                   </Button>
+                 </Box>
+                 <Button
+                   size="small"
+                   variant="outlined"
+                   onClick={() => {
+                     setDateRangeFilter('next');
+                     setStartDate(dayjs().subtract(1, "week"));
+                     setEndDate(dayjs().add(12, "month"));
+                   }}
+                   sx={{
+                     color: "rgba(255,255,255,0.9)",
+                     borderColor: "rgba(255,255,255,0.3)",
+                     fontSize: "0.6rem",
+                     py: 0.3,
+                     px: 0.8,
+                     minWidth: "auto",
+                     mt: 0.5,
+                     "&:hover": {
+                       borderColor: "white",
+                       backgroundColor: "rgba(255,255,255,0.1)",
+                     }
+                   }}
+                 >
+                   Reset to Next 12M
+                 </Button>
+               </Box>
+             </Box>
 
             {/* Date Range */}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -711,7 +755,7 @@ export default function Dashboard() {
               <strong>Current Week:</strong> {weeks.find(w => w.isCurrentWeek)?.weekLabel || 'Not in range'}
             </Typography>
                          <Typography variant="body2">
-               <strong>Timeline:</strong> {calculatedStartDate.format('DD/MM/YYYY')} to {calculatedEndDate.format('DD/MM/YYYY')}
+               <strong>Timeline:</strong> {startDate.format('DD/MM/YYYY')} to {endDate.format('DD/MM/YYYY')}
              </Typography>
           </Box>
         </CardContent>
