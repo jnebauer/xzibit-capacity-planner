@@ -104,7 +104,7 @@ function generateTimelineWeeks(startDate: Date, endDate: Date) {
   return weeks;
 }
 
-// Calculate realistic demand distribution with curve selection
+// Calculate realistic demand distribution (same data for all modes)
 function calculateWeeklyDemand(projects: any[], weeks: any[], includeOnsite: boolean = false, curveMode: string = 'adrian') {
   const demand = {
     cnc: {} as Record<string, number>,
@@ -148,26 +148,9 @@ function calculateWeeklyDemand(projects: any[], weeks: any[], includeOnsite: boo
       }
     }
     
-    // Distribute hours across build weeks based on curve mode
+    // Use EVEN distribution for all modes - same data, different visual representation
     const buildWeeks = Math.max(1, processed.weeksToBuild);
-    let weeklyDistribution: number[] = [];
-    
-    switch (curveMode) {
-      case 'adrian':
-        // Bell curve (Mathematician) - peak in middle
-        weeklyDistribution = generateBellCurve(buildWeeks);
-        break;
-      case 'flat':
-        // Even distribution
-        weeklyDistribution = new Array(buildWeeks).fill(1 / buildWeeks);
-        break;
-      case 'linear':
-        // Increasing toward truck date
-        weeklyDistribution = generateLinearCurve(buildWeeks);
-        break;
-      default:
-        weeklyDistribution = generateBellCurve(buildWeeks);
-    }
+    const weeklyDistribution = new Array(buildWeeks).fill(1 / buildWeeks);
     
     for (let i = 0; i < buildWeeks; i++) {
       const weekIndex = projectStartWeek + i;
@@ -207,51 +190,7 @@ function calculateWeeklyDemand(projects: any[], weeks: any[], includeOnsite: boo
   return demand;
 }
 
-// Generate bell curve distribution (peak in middle)
-function generateBellCurve(weeks: number): number[] {
-  if (weeks === 1) return [1];
-  
-  const distribution = [];
-  const midPoint = (weeks - 1) / 2;
-  
-  for (let i = 0; i < weeks; i++) {
-    const distance = Math.abs(i - midPoint);
-    const weight = Math.exp(-(distance * distance) / (2 * (weeks / 4) * (weeks / 4)));
-    distribution.push(weight);
-  }
-  
-  // Normalize to sum to 1
-  const total = distribution.reduce((sum, val) => sum + val, 0);
-  return distribution.map(val => val / total);
-}
-
-// Generate complex zig-zag curve distribution with multiple peaks and troughs
-function generateLinearCurve(weeks: number): number[] {
-  if (weeks === 1) return [1];
-  
-  const distribution = [];
-  
-  for (let i = 0; i < weeks; i++) {
-    // Create multiple zig-zag cycles with different amplitudes
-    const cycle1 = Math.sin((i * Math.PI * 2) / (weeks / 3)) * 2;
-    const cycle2 = Math.sin((i * Math.PI * 3) / (weeks / 2)) * 1.5;
-    const cycle3 = Math.sin((i * Math.PI * 1.5) / (weeks / 4)) * 3;
-    
-    // Combine cycles with upward trend
-    const baseValue = 1 + (i * 0.3); // Gradual upward trend
-    const combinedCycles = (cycle1 + cycle2 + cycle3) / 3;
-    
-    // Create sharp transitions by rounding to create more angular lines
-    const sharpValue = Math.round(combinedCycles * 10) / 10;
-    const value = Math.max(0.1, baseValue + sharpValue);
-    
-    distribution.push(value);
-  }
-  
-  // Normalize to sum to 1
-  const total = distribution.reduce((sum, val) => sum + val, 0);
-  return distribution.map(val => val / total);
-}
+// Note: Curve generation functions removed - all modes now use same data with different visual representation
 
 // Calculate realistic capacity with employee leave consideration
 function calculateWeeklyCapacity(staff: any[], weeks: any[]) {
@@ -598,9 +537,9 @@ export default function Dashboard() {
                    Linear
                  </ToggleButton>
                </ToggleButtonGroup>
-                               <Typography variant="caption" sx={{ opacity: 0.8, textAlign: "center", mt: 0.5, fontSize: "0.6rem" }}>
-                  Adrian: Bell curve | Flat: Even distribution | Linear: Straight lines (zig-zag pattern)
-                </Typography>
+                                                               <Typography variant="caption" sx={{ opacity: 0.8, textAlign: "center", mt: 0.5, fontSize: "0.6rem" }}>
+                   Adrian: Smooth curves | Flat: Straight lines | Linear: Straight lines (Same data, different visual)
+                 </Typography>
              </Box>
 
                          {/* Date Range Filter */}
@@ -815,7 +754,7 @@ export default function Dashboard() {
                 
                 {/* Total lines */}
                 <Line
-                  type="monotone"
+                  type={curveMode === 'adrian' ? "monotone" : "linear"}
                   dataKey="totalDemand"
                   name="Total Demand (h)"
                   strokeWidth={3}
@@ -824,7 +763,7 @@ export default function Dashboard() {
                   activeDot={{ r: 6, stroke: "#ff6b6b", strokeWidth: 2 }}
                 />
                 <Line
-                  type="monotone"
+                  type={curveMode === 'adrian' ? "monotone" : "linear"}
                   dataKey="totalCapacity"
                   name="Total Capacity (h)"
                   strokeWidth={3}
@@ -836,7 +775,7 @@ export default function Dashboard() {
                 {/* Skill demand lines */}
                 {skillVisibility.CNC && (
                   <Line
-                    type="monotone"
+                    type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="cncDemand"
                     name="CNC Demand"
                     strokeWidth={2}
@@ -847,7 +786,7 @@ export default function Dashboard() {
                 )}
                 {skillVisibility.Build && (
                   <Line
-                    type="monotone"
+                    type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="buildDemand"
                     name="Build Demand"
                     strokeWidth={2}
@@ -858,7 +797,7 @@ export default function Dashboard() {
                 )}
                 {skillVisibility.Paint && (
                   <Line
-                    type="monotone"
+                    type={curveMode === 'linear' ? "linear" : "monotone"}
                     dataKey="paintDemand"
                     name="Paint Demand"
                     strokeWidth={2}
@@ -869,7 +808,7 @@ export default function Dashboard() {
                 )}
                 {skillVisibility.AV && (
                   <Line
-                    type="monotone"
+                    type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="avDemand"
                     name="AV Demand"
                     strokeWidth={2}
@@ -880,7 +819,7 @@ export default function Dashboard() {
                 )}
                 {skillVisibility["Pack & Load"] && (
                   <Line
-                    type="monotone"
+                    type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="packLoadDemand"
                     name="P&L Demand"
                     strokeWidth={2}
