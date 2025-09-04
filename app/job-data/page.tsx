@@ -268,8 +268,7 @@ export default function JobData() {
       tradeOnsite: 0,
       onsiteWeeks: 0,
       probability: 0.9,
-      status: null,
-      curveMode: 'Mathematician'
+      status: null
     });
     setEditDialogOpen(true);
   };
@@ -353,22 +352,7 @@ export default function JobData() {
         />
       ),
     },
-    {
-      field: "curveMode",
-      headerName: "Curve Mode",
-      width: 150,
-      editable: true,
-      type: "singleSelect",
-      valueOptions: ["Mathematician", "Linear", "Triangular"],
-      renderCell: (params) => (
-        <Chip 
-          label={params.value || 'Mathematician'} 
-          size="small" 
-          variant="outlined"
-          color="secondary"
-        />
-      ),
-    },
+
     {
       field: "truckLoadDate",
       headerName: "MUST FILL Truck Load Date",
@@ -807,13 +791,22 @@ export default function JobData() {
               <Typography variant="h6" sx={{ color: '#495057', fontWeight: 600 }}>
                 Project Status Summary
               </Typography>
-                             <Chip 
-                 label="Sorted by Truck Load Date (Latest First)" 
-                 size="small" 
-                 color="primary" 
-                 variant="outlined"
-                 sx={{ fontSize: '0.75rem' }}
-               />
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Chip 
+                  label="Sorted by Truck Load Date (Latest First)" 
+                  size="small" 
+                  color="primary" 
+                  variant="outlined"
+                  sx={{ fontSize: '0.75rem' }}
+                />
+                <Chip 
+                  label="Curve Selection moved to Dashboard" 
+                  size="small" 
+                  color="info" 
+                  variant="outlined"
+                  sx={{ fontSize: '0.75rem' }}
+                />
+              </Box>
             </Box>
             <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               <Box sx={{ textAlign: 'center' }}>
@@ -967,21 +960,7 @@ export default function JobData() {
                    <MenuItem value="approved">approved</MenuItem>
                  </Select>
                </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>Curve Mode</InputLabel>
-                <Select
-                  value={editingProject.curveMode || 'Mathematician'}
-                  onChange={(e) => setEditingProject({ ...editingProject, curveMode: e.target.value })}
-                  label="Curve Mode"
-                >
-                  <MenuItem value="Mathematician">Mathematician (Bell Curve)</MenuItem>
-                  <MenuItem value="Linear">Linear (Even Distribution)</MenuItem>
-                  <MenuItem value="Triangular">Triangular (Peak in Middle)</MenuItem>
-                </Select>
-                <FormHelperText>
-                  Mathematician: Bell curve distribution, Linear: Even distribution, Triangular: Peak in middle
-                </FormHelperText>
-              </FormControl>
+
                              <TextField
                  label="Truck Load Date"
                  type="date"

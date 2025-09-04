@@ -28,6 +28,8 @@ import {
   Alert,
   CircularProgress,
   Button,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -58,6 +60,14 @@ function processProjectForDashboard(project: any) {
     // Calculate total build hours
     totalBuildHours: (project.cnc || 0) + (project.build || 0) + (project.paint || 0) + (project.av || 0) + (project.packAndLoad || 0)
   };
+}
+
+// Check if project has complete data for capacity planning
+function hasCompleteData(project: any) {
+  return project.truckLoadDate && 
+         project.weeksToBuild !== undefined && 
+         project.weeksToBuild > 0 &&
+         (project.build > 0 || project.cnc > 0 || project.paint > 0 || project.av > 0 || project.packAndLoad > 0);
 }
 
 // Generate weeks with proper labels
@@ -94,8 +104,8 @@ function generateTimelineWeeks(startDate: Date, endDate: Date) {
   return weeks;
 }
 
-// Calculate realistic demand distribution
-function calculateWeeklyDemand(projects: any[], weeks: any[], includeOnsite: boolean = false) {
+// Calculate realistic demand distribution with curve selection
+function calculateWeeklyDemand(projects: any[], weeks: any[], includeOnsite: boolean = false, curveMode: string = 'adrian') {
   const demand = {
     cnc: {} as Record<string, number>,
     build: {} as Record<string, number>,
@@ -138,23 +148,41 @@ function calculateWeeklyDemand(projects: any[], weeks: any[], includeOnsite: boo
       }
     }
     
-    // Distribute hours across build weeks
+    // Distribute hours across build weeks based on curve mode
     const buildWeeks = Math.max(1, processed.weeksToBuild);
-    const hoursPerWeek = processed.totalBuildHours / buildWeeks;
+    let weeklyDistribution: number[] = [];
+    
+    switch (curveMode) {
+      case 'adrian':
+        // Bell curve (Mathematician) - peak in middle
+        weeklyDistribution = generateBellCurve(buildWeeks);
+        break;
+      case 'flat':
+        // Even distribution
+        weeklyDistribution = new Array(buildWeeks).fill(1 / buildWeeks);
+        break;
+      case 'linear':
+        // Increasing toward truck date
+        weeklyDistribution = generateLinearCurve(buildWeeks);
+        break;
+      default:
+        weeklyDistribution = generateBellCurve(buildWeeks);
+    }
     
     for (let i = 0; i < buildWeeks; i++) {
       const weekIndex = projectStartWeek + i;
       if (weekIndex < weeks.length) {
         const weekKey = weeks[weekIndex].weekStart;
+        const hoursThisWeek = processed.totalBuildHours * weeklyDistribution[i];
         
         // Distribute skill hours proportionally
-        const skillRatio = hoursPerWeek / processed.totalBuildHours;
+        const skillRatio = hoursThisWeek / processed.totalBuildHours;
         demand.cnc[weekKey] += processed.cnc * skillRatio;
         demand.build[weekKey] += processed.build * skillRatio;
         demand.paint[weekKey] += processed.paint * skillRatio;
         demand.av[weekKey] += processed.av * skillRatio;
         demand.packAndLoad[weekKey] += processed.packAndLoad * skillRatio;
-        demand.total[weekKey] += hoursPerWeek;
+        demand.total[weekKey] += hoursThisWeek;
       }
     }
 
@@ -179,7 +207,53 @@ function calculateWeeklyDemand(projects: any[], weeks: any[], includeOnsite: boo
   return demand;
 }
 
-// Calculate realistic capacity
+// Generate bell curve distribution (peak in middle)
+function generateBellCurve(weeks: number): number[] {
+  if (weeks === 1) return [1];
+  
+  const distribution = [];
+  const midPoint = (weeks - 1) / 2;
+  
+  for (let i = 0; i < weeks; i++) {
+    const distance = Math.abs(i - midPoint);
+    const weight = Math.exp(-(distance * distance) / (2 * (weeks / 4) * (weeks / 4)));
+    distribution.push(weight);
+  }
+  
+  // Normalize to sum to 1
+  const total = distribution.reduce((sum, val) => sum + val, 0);
+  return distribution.map(val => val / total);
+}
+
+// Generate complex zig-zag curve distribution with multiple peaks and troughs
+function generateLinearCurve(weeks: number): number[] {
+  if (weeks === 1) return [1];
+  
+  const distribution = [];
+  
+  for (let i = 0; i < weeks; i++) {
+    // Create multiple zig-zag cycles with different amplitudes
+    const cycle1 = Math.sin((i * Math.PI * 2) / (weeks / 3)) * 2;
+    const cycle2 = Math.sin((i * Math.PI * 3) / (weeks / 2)) * 1.5;
+    const cycle3 = Math.sin((i * Math.PI * 1.5) / (weeks / 4)) * 3;
+    
+    // Combine cycles with upward trend
+    const baseValue = 1 + (i * 0.3); // Gradual upward trend
+    const combinedCycles = (cycle1 + cycle2 + cycle3) / 3;
+    
+    // Create sharp transitions by rounding to create more angular lines
+    const sharpValue = Math.round(combinedCycles * 10) / 10;
+    const value = Math.max(0.1, baseValue + sharpValue);
+    
+    distribution.push(value);
+  }
+  
+  // Normalize to sum to 1
+  const total = distribution.reduce((sum, val) => sum + val, 0);
+  return distribution.map(val => val / total);
+}
+
+// Calculate realistic capacity with employee leave consideration
 function calculateWeeklyCapacity(staff: any[], weeks: any[]) {
   const capacity = {
     total: {} as Record<string, number>
@@ -190,12 +264,35 @@ function calculateWeeklyCapacity(staff: any[], weeks: any[]) {
     capacity.total[week.weekStart] = 0;
   });
 
-  // Calculate capacity: 40 hours per week per staff member
+  // Calculate capacity: 40 hours per week per staff member, minus leave
   staff.forEach(person => {
     const weeklyHours = 40; // 8 hours/day * 5 days/week
     
     weeks.forEach(week => {
-      capacity.total[week.weekStart] += weeklyHours;
+      let availableHours = weeklyHours;
+      
+      // Check if staff member is on leave this week
+      if (person.leave && Array.isArray(person.leave)) {
+        const weekStart = new Date(week.weekStart);
+        const weekEnd = new Date(week.weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        
+        // Check if any leave dates fall within this week
+        const hasLeaveThisWeek = person.leave.some((leave: any) => {
+          try {
+            const leaveDate = new Date(leave.date);
+            return leaveDate >= weekStart && leaveDate <= weekEnd;
+          } catch (error) {
+            return false;
+          }
+        });
+        
+        if (hasLeaveThisWeek) {
+          availableHours = 0; // Full week off
+        }
+      }
+      
+      capacity.total[week.weekStart] += availableHours;
     });
   });
 
@@ -221,6 +318,9 @@ export default function Dashboard() {
 
   // Date range filter state
   const [dateRangeFilter, setDateRangeFilter] = useState<'next' | 'previous'>('next');
+
+  // Curve selection state
+  const [curveMode, setCurveMode] = useState<'adrian' | 'flat' | 'linear'>('adrian');
 
   // Calculate date range based on filter
   const calculatedStartDate = useMemo(() => {
@@ -285,7 +385,7 @@ export default function Dashboard() {
   const projects = projectsData || [];
   const staff = staffData || [];
 
-  // Proper project filtering
+  // Proper project filtering - EXCLUDE incomplete data projects
   const filteredProjects = useMemo(() => {
     return projects.filter((project: any) => {
       // Filter by probability
@@ -293,10 +393,8 @@ export default function Dashboard() {
         if (project.probability < probability / 100) return false;
       }
       
-      // Include projects with build hours
-      const hasBuildHours = (project.build || 0) + (project.cnc || 0) + (project.paint || 0) + 
-                           (project.av || 0) + (project.packAndLoad || 0) > 0;
-      return hasBuildHours;
+      // ONLY include projects with complete data
+      return hasCompleteData(project);
     });
   }, [projects, probability]);
 
@@ -305,10 +403,10 @@ export default function Dashboard() {
     return generateTimelineWeeks(startDate.toDate(), endDate.toDate());
   }, [startDate, endDate]);
 
-  // Calculate demand and capacity
+  // Calculate demand and capacity with curve selection
   const demand = useMemo(() => {
-    return calculateWeeklyDemand(filteredProjects, weeks, includeOnsite);
-  }, [filteredProjects, weeks, includeOnsite]);
+    return calculateWeeklyDemand(filteredProjects, weeks, includeOnsite, curveMode);
+  }, [filteredProjects, weeks, includeOnsite, curveMode]);
 
   const capacity = useMemo(() => {
     return calculateWeeklyCapacity(staff, weeks);
@@ -460,6 +558,51 @@ export default function Dashboard() {
               />
             </Box>
 
+                         {/* Curve Selection */}
+             <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+               <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 1, textAlign: "center" }}>
+                 Curve Selection (applies to all projects)
+               </Typography>
+               <ToggleButtonGroup
+                 value={curveMode}
+                 exclusive
+                 onChange={(_, newMode) => newMode && setCurveMode(newMode)}
+                 size="small"
+                 sx={{
+                   backgroundColor: "rgba(255,255,255,0.1)",
+                   border: "1px solid rgba(255,255,255,0.2)",
+                   "& .MuiToggleButton-root": {
+                     color: "rgba(255,255,255,0.8)",
+                     borderColor: "rgba(255,255,255,0.2)",
+                     fontSize: "0.7rem",
+                     px: 1,
+                     py: 0.5,
+                     "&.Mui-selected": {
+                       backgroundColor: "rgba(255,255,255,0.2)",
+                       color: "white",
+                       fontWeight: 600,
+                     },
+                     "&:hover": {
+                       backgroundColor: "rgba(255,255,255,0.15)",
+                     },
+                   },
+                 }}
+               >
+                 <ToggleButton value="adrian" sx={{ minWidth: "60px" }}>
+                   Adrian
+                 </ToggleButton>
+                 <ToggleButton value="flat" sx={{ minWidth: "60px" }}>
+                   Flat
+                 </ToggleButton>
+                 <ToggleButton value="linear" sx={{ minWidth: "60px" }}>
+                   Linear
+                 </ToggleButton>
+               </ToggleButtonGroup>
+                               <Typography variant="caption" sx={{ opacity: 0.8, textAlign: "center", mt: 0.5, fontSize: "0.6rem" }}>
+                  Adrian: Bell curve | Flat: Even distribution | Linear: Straight lines (zig-zag pattern)
+                </Typography>
+             </Box>
+
                          {/* Date Range Filter */}
              <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
                <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 1 }}>
@@ -542,39 +685,63 @@ export default function Dashboard() {
                   Date Range
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-                  <DatePicker
-                    value={startDate}
-                    onChange={(v) => v && setStartDate(v)}
-                    format="DD/MM/YYYY"
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        placeholder: "Start",
-                        sx: {
-                          border: "1px solid white",
-                          "& .MuiInputBase-root": { color: "white", border: "1px solid white" },
-                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                        },
-                      },
-                    }}
-                  />
-                  <DatePicker
-                    value={endDate}
-                    onChange={(v) => v && setEndDate(v)}
-                    format="DD/MM/YYYY"
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        placeholder: "End",
-                        sx: {
-                          border: "1px solid white",
-                          "& .MuiInputBase-root": { color: "white", border: "1px solid white" },
-                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                        },
-                      },
-                    }}
-                  />
-                                 </Box>
+                                     <DatePicker
+                     value={startDate}
+                     onChange={(v) => v && setStartDate(v)}
+                     format="DD/MM/YYYY"
+                     slotProps={{
+                       textField: {
+                         size: "medium",
+                         placeholder: "Start",
+                         sx: {
+                           border: "1px solid white",
+                           "& .MuiInputBase-root": { 
+                             color: "white", 
+                             border: "1px solid white",
+                             minWidth: "120px"
+                           },
+                           "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                           "& .MuiInputBase-input": {
+                             fontSize: "14px",
+                             padding: "16.5px 14px",
+                             minHeight: "1.4375em"
+                           },
+                           "& .MuiInputLabel-root": {
+                             fontSize: "14px"
+                           }
+                         },
+                       },
+                     }}
+                   />
+                                     <DatePicker
+                     value={endDate}
+                     onChange={(v) => v && setEndDate(v)}
+                     format="DD/MM/YYYY"
+                     slotProps={{
+                       textField: {
+                         size: "medium",
+                         placeholder: "End",
+                         sx: {
+                           border: "1px solid white",
+                           "& .MuiInputBase-root": { 
+                             color: "white", 
+                             border: "1px solid white",
+                             minWidth: "120px"
+                           },
+                           "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                           "& .MuiInputBase-input": {
+                             fontSize: "14px",
+                             padding: "16.5px 14px",
+                             minHeight: "1.4375em"
+                           },
+                           "& .MuiInputLabel-root": {
+                             fontSize: "14px"
+                           }
+                         },
+                       },
+                     }}
+                   />
+                </Box>
               </Box>
             </LocalizationProvider>
 
@@ -737,7 +904,7 @@ export default function Dashboard() {
           
           <Box sx={{ display: "grid", gap: 2 }}>
             <Typography variant="body2">
-              <strong>Total Projects:</strong> {projects.length} | <strong>Filtered Projects:</strong> {filteredProjects.length}
+              <strong>Total Projects:</strong> {projects.length} | <strong>Filtered Projects (Complete Data Only):</strong> {filteredProjects.length}
             </Typography>
             <Typography variant="body2">
               <strong>Total Staff:</strong> {staff.length}
@@ -756,6 +923,18 @@ export default function Dashboard() {
             </Typography>
                          <Typography variant="body2">
                <strong>Timeline:</strong> {startDate.format('DD/MM/YYYY')} to {endDate.format('DD/MM/YYYY')}
+             </Typography>
+             <Typography variant="body2">
+               <strong>Curve Mode:</strong> {curveMode === 'adrian' ? 'Adrian (Mathematician)' : curveMode === 'flat' ? 'Flat (Even Distribution)' : 'Linear (Increasing)'}
+             </Typography>
+             <Typography variant="body2">
+               <strong>Projects Excluded (Incomplete Data):</strong> {projects.length - filteredProjects.length}
+             </Typography>
+             <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
+               Note: Only projects with complete data (truck load date, weeks to build, and skill hours) are shown on the graph
+             </Typography>
+             <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
+               Note: Capacity line adjusts based on employee leave dates (shows 0 hours when staff are on leave)
              </Typography>
           </Box>
         </CardContent>
