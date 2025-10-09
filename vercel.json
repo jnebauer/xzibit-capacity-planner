@@ -1,10 +1,10 @@
 {
-   "builds": [
-     {
-       "src": "package.json",
-       "use": "@vercel/static-build"
-     }
-   ],
-   "buildCommand": "npm run build",
-   "outputDirectory": "dist"
- }
+  "functions": {
+    "app/api/sync/pull/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/sync/push/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}
