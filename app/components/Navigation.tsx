@@ -28,7 +28,6 @@ export default function Navigation() {
     return href;
   };
 
-  // Show loader when pathname changes
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
