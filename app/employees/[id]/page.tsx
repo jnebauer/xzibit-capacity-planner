@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -60,6 +60,8 @@ export default function EmployeeView() {
   const params = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const accessToken = searchParams.get('access_token');
   const employeeId = params.id as string;
   
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
@@ -142,11 +144,17 @@ export default function EmployeeView() {
   const handleEdit = () => {
     // For now, just go back to employees list
     // TODO: Implement edit functionality
-    router.push('/employees');
+    const url = accessToken 
+      ? `/employees?access_token=${accessToken}`
+      : '/employees';
+    router.push(url);
   };
 
   const handleBack = () => {
-    router.push('/employees');
+    const url = accessToken 
+      ? `/employees?access_token=${accessToken}`
+      : '/employees';
+    router.push(url);
   };
 
   const getSkillLevel = (skill: string) => {
