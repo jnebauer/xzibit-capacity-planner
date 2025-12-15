@@ -46,7 +46,7 @@ async function importSampleData() {
     }));
 
     // Import staff
-    const staffRows = sampleData.staff.map((staff, index) => ({
+`    const staffRows = sampleData.staff.map((staff, index) => ({
       sheet: "employees",
       rowNumber: index + 1,
       data: {
@@ -63,7 +63,7 @@ async function importSampleData() {
       synced: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }));
+    }));`
 
     // Insert all data
     await collection.insertMany([...projectRows, ...staffRows]);

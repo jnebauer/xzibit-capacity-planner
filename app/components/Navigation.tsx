@@ -2,16 +2,12 @@
 
 import { AppBar, Toolbar, Typography, Box, Button, Container, LinearProgress } from "@mui/material";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function Navigation() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Get access_token from current URL
-  const accessToken = searchParams.get('access_token');
   
   const navItems = [
     { label: "Dashboard", href: "/dashboard" },
@@ -19,14 +15,6 @@ export default function Navigation() {
     { label: "Employees", href: "/employees" },
     { label: "Curves Explainer", href: "/curves-explainer" },
   ];
-
-  // Helper function to add access_token to href
-  const getHrefWithToken = (href: string) => {
-    if (accessToken) {
-      return `${href}?access_token=${accessToken}`;
-    }
-    return href;
-  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -69,7 +57,7 @@ export default function Navigation() {
               justifyContent: { xs: 'center', md: 'flex-start' }
             }}>
               {navItems.map((item) => (
-                <Link key={item.href} href={getHrefWithToken(item.href)} style={{ textDecoration: 'none' }}>
+                <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
                   <Button
                     sx={{
                       color: pathname === item.href ? 'white' : 'rgba(255,255,255,0.8)',

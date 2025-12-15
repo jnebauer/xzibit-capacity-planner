@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Box, 
@@ -31,8 +31,6 @@ import {
 export default function ProjectView() {
   const params = useParams();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const accessToken = searchParams.get('access_token');
   const projectId = params.id as string;
 
   const { data: project, isLoading, error } = useQuery({
@@ -64,17 +62,11 @@ export default function ProjectView() {
   }
 
   const handleEdit = () => {
-    const url = accessToken 
-      ? `/job-data/edit/${projectId}?access_token=${accessToken}`
-      : `/job-data/edit/${projectId}`;
-    router.push(url);
+    router.push(`/job-data/edit/${projectId}`);
   };
 
   const handleBack = () => {
-    const url = accessToken 
-      ? `/job-data?access_token=${accessToken}`
-      : '/job-data';
-    router.push(url);
+    router.push('/job-data');
   };
 
   return (

@@ -304,19 +304,39 @@ export default function Dashboard() {
   const { data: projectsData, isLoading: projectsLoading, error: projectsError } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
-      const response = await fetch("/api/projects");
-      if (!response.ok) throw new Error("Failed to fetch projects");
-      return response.json();
+      try {
+        const response = await fetch("/api/projects");
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to fetch projects");
+        }
+        return response.json();
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        throw error;
+      }
     },
+    retry: 2,
+    retryDelay: 1000,
   });
 
   const { data: staffData, isLoading: staffLoading, error: staffError } = useQuery({
     queryKey: ["staff"],
     queryFn: async () => {
-      const response = await fetch("/api/staff");
-      if (!response.ok) throw new Error("Failed to fetch staff");
-      return response.json();
+      try {
+        const response = await fetch("/api/staff");
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to fetch staff");
+        }
+        return response.json();
+      } catch (error) {
+        console.error("Error fetching staff:", error);
+        throw error;
+      }
     },
+    retry: 2,
+    retryDelay: 1000,
   });
 
   const projects = projectsData || [];
@@ -391,10 +411,24 @@ export default function Dashboard() {
   }
 
   if (projectsError || staffError) {
+    const errorMessage = projectsError 
+      ? (projectsError as Error).message || "Failed to load projects"
+      : (staffError as Error).message || "Failed to load staff";
+    
     return (
-      <Alert severity="error">
-        Failed to load data. Please try refreshing the page.
-      </Alert>
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {errorMessage}
+        </Alert>
+        <Button 
+          variant="contained" 
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
+          Refresh Page
+        </Button>
+      </Box>
     );
   }
 

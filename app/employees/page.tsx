@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
 import { 
   DataGrid, 
   GridColDef, 
@@ -61,8 +60,6 @@ import dayjs, { Dayjs } from 'dayjs';
 export default function Employees() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const accessToken = searchParams.get('access_token');
   
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
   const [paginationModel, setPaginationModel] = useState({
@@ -210,11 +207,8 @@ export default function Employees() {
   }, [deleteStaffMutation]);
 
   const handleViewEmployee = useCallback((id: GridRowId) => {
-    const url = accessToken 
-      ? `/employees/${id}?access_token=${accessToken}`
-      : `/employees/${id}`;
-    router.push(url);
-  }, [router, accessToken]);
+    router.push(`/employees/${id}`);
+  }, [router]);
 
   const handleManageLeave = useCallback((id: GridRowId) => {
     const staff = staffData?.find((s: any) => s._id === id);

@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
 import { 
   DataGrid, 
   GridColDef, 
@@ -39,8 +38,6 @@ import dayjs from 'dayjs';
 
 export default function JobData() {
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
-  const accessToken = searchParams.get('access_token');
   
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
   const [paginationModel, setPaginationModel] = useState({
@@ -644,10 +641,7 @@ export default function JobData() {
           icon={<VisibilityIcon />}
           label="View"
           onClick={() => {
-            const url = accessToken 
-              ? `/job-data/${params.row._id}?access_token=${accessToken}`
-              : `/job-data/${params.row._id}`;
-            window.location.href = url;
+            window.location.href = `/job-data/${params.row._id}`;
           }}
         />,
         <GridActionsCellItem
