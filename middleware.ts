@@ -38,6 +38,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // DEVELOPMENT MODE: Skip authentication for local testing
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔓 Development mode - authentication bypassed');
+    const response = NextResponse.next();
+    // Set mock user headers for development
+    response.headers.set('x-user-id', 'dev-user');
+    response.headers.set('x-user-email', 'dev@localhost');
+    response.headers.set('x-user-role', 'admin');
+    response.headers.set('x-is-admin', 'true');
+    return response;
+  }
+
   // Token coming from URL (redirect from xzibit apps)
   const urlToken = searchParams.get('access_token');
 
