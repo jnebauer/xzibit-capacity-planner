@@ -1,68 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/mongo';
-import JobType from '@/models/JobType';
+import { supabase, toJobType } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    await dbConnect();
-    
-    const jobTypes = await JobType.find({ isActive: true }).sort({ name: 1 });
-    
-    return NextResponse.json(jobTypes);
+    const { data, error } = await supabase
+      .from('cp_job_types').select('*').order('name', { ascending: true });
+    if (error) throw error;
+    return NextResponse.json((data || []).map(toJobType));
   } catch (error: any) {
-    console.error('Error fetching job types:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error?.message || 'Unknown error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch job types', details: error?.message }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    await dbConnect();
-    
-    const jobTypeData = await request.json();
-    
-    // Validate required fields
-    if (!jobTypeData.name) {
-      return NextResponse.json(
-        { error: 'Job type name is required' },
-        { status: 400 }
-      );
+    const body = await request.json();
+    if (!body.name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    const { data, error } = await supabase.from('cp_job_types')
+      .insert({ name: body.name, description: body.description || null, is_active: body.isActive !== undefined ? body.isActive : true })
+      .select().single();
+    if (error) {
+      if (error.code === '23505') return NextResponse.json({ error: 'Job type with this name already exists' }, { status: 409 });
+      throw error;
     }
-
-    // Check if job type name already exists
-    const existingJobType = await JobType.findOne({ 
-      name: { $regex: new RegExp(`^${jobTypeData.name}$`, 'i') } 
-    });
-    
-    if (existingJobType) {
-      return NextResponse.json(
-        { error: 'Job type with this name already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Create new job type
-    const newJobType = new JobType({
-      name: jobTypeData.name,
-      description: jobTypeData.description || '',
-      isActive: true
-    });
-
-    await newJobType.save();
-
-    return NextResponse.json({
-      message: 'Job type created successfully',
-      jobType: newJobType
-    }, { status: 201 });
-
+    return NextResponse.json({ message: 'Job type created successfully', jobType: toJobType(data) }, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating job type:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error?.message || 'Unknown error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error', details: error?.message }, { status: 500 });
   }
 }

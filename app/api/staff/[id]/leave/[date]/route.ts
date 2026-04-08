@@ -1,52 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/mongo';
-import Staff from '@/models/Staff';
+import { supabase } from '@/lib/supabase';
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string; date: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string; date: string } }) {
   try {
-    await dbConnect();
-    
-    const { id, date } = params;
-    const decodedDate = decodeURIComponent(date);
-    
-    // Check if staff member exists
-    const staff = await Staff.findById(id);
-    if (!staff) {
-      return NextResponse.json(
-        { error: 'Staff member not found' },
-        { status: 404 }
-      );
-    }
+    const decodedDate = decodeURIComponent(params.date);
+    const { data: staff } = await supabase.from('cp_staff').select('id').eq('mongo_id', params.id).single();
+    if (!staff) return NextResponse.json({ error: 'Staff member not found' }, { status: 404 });
 
-    // Find and remove the specific leave date
-    const leaveIndex = staff.leave.findIndex(
-      (leave: any) => leave.date === decodedDate
-    );
-    
-    if (leaveIndex === -1) {
-      return NextResponse.json(
-        { error: 'Leave date not found' },
-        { status: 404 }
-      );
-    }
+    const { data: leave } = await supabase.from('cp_staff_leave')
+      .select('id').eq('staff_mongo_id', params.id).eq('date', decodedDate).single();
+    if (!leave) return NextResponse.json({ error: 'Leave date not found' }, { status: 404 });
 
-    // Remove the leave date
-    staff.leave.splice(leaveIndex, 1);
-    await staff.save();
+    await supabase.from('cp_staff_leave').delete().eq('id', leave.id);
 
+    const { data: allLeave } = await supabase.from('cp_staff_leave')
+      .select('*').eq('staff_mongo_id', params.id);
     return NextResponse.json({
       message: 'Leave date removed successfully',
-      leave: staff.leave
+      leave: (allLeave || []).map(l => ({ _id: l.id, date: l.date, leaveType: l.leave_type, notes: l.notes }))
     });
-
-  } catch (error) {
-    console.error('Error removing leave:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Internal server error', details: error?.message }, { status: 500 });
   }
 }

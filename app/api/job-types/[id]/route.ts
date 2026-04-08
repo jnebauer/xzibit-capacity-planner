@@ -1,145 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/mongo';
-import JobType from '@/models/JobType';
+import { supabase, toJobType } from '@/lib/supabase';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect();
-    
-    const { id } = params;
-    
-    const jobType = await JobType.findById(id);
-    
-    if (!jobType) {
-      return NextResponse.json(
-        { error: 'Job type not found' },
-        { status: 404 }
-      );
-    }
-    
-    return NextResponse.json(jobType);
+    const { data, error } = await supabase.from('cp_job_types')
+      .select('*').eq('mongo_id', params.id).single();
+    if (error || !data) return NextResponse.json({ error: 'Job type not found' }, { status: 404 });
+    return NextResponse.json(toJobType(data));
   } catch (error: any) {
-    console.error('Error fetching job type:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error?.message || 'Unknown error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error', details: error?.message }, { status: 500 });
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect();
-    
-    const { id } = params;
-    const updateData = await request.json();
-    
-    // Validate required fields
-    if (!updateData.name) {
-      return NextResponse.json(
-        { error: 'Job type name is required' },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
+    const updateData: any = {};
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.isActive !== undefined) updateData.is_active = body.isActive;
+    updateData.updated_at = new Date().toISOString();
 
-    // Check if job type name already exists (excluding current job type)
-    const existingJobType = await JobType.findOne({ 
-      _id: { $ne: id },
-      name: { $regex: new RegExp(`^${updateData.name}$`, 'i') } 
-    });
-    
-    if (existingJobType) {
-      return NextResponse.json(
-        { error: 'Job type with this name already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Update job type
-    const updatedJobType = await JobType.findByIdAndUpdate(
-      id,
-      {
-        name: updateData.name,
-        description: updateData.description || '',
-        isActive: updateData.isActive !== undefined ? updateData.isActive : true
-      },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedJobType) {
-      return NextResponse.json(
-        { error: 'Job type not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      message: 'Job type updated successfully',
-      jobType: updatedJobType
-    });
-
+    const { data, error } = await supabase.from('cp_job_types')
+      .update(updateData).eq('mongo_id', params.id).select().single();
+    if (error || !data) return NextResponse.json({ error: 'Job type not found' }, { status: 404 });
+    return NextResponse.json({ message: 'Job type updated successfully', jobType: toJobType(data) });
   } catch (error: any) {
-    console.error('Error updating job type:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error?.message || 'Unknown error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error', details: error?.message }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect();
-    
-    const { id } = params;
-    
-    // Check if job type is being used by any projects
-    const Project = (await import('@/models/Project')).default;
-    const projectsUsingJobType = await Project.find({ jobType: id });
-    
-    if (projectsUsingJobType.length > 0) {
-      return NextResponse.json(
-        { 
-          error: 'Cannot delete job type. It is being used by projects.',
-          projectCount: projectsUsingJobType.length
-        },
-        { status: 400 }
-      );
+    // Check if any projects use this job type
+    const { data: projects } = await supabase.from('cp_projects')
+      .select('id').eq('job_type_mongo_id', params.id).limit(1);
+    if (projects && projects.length > 0) {
+      return NextResponse.json({ error: 'Cannot delete job type. It is being used by projects.', projectCount: projects.length }, { status: 400 });
     }
-    
-    // Soft delete by setting isActive to false
-    const deletedJobType = await JobType.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
-
-    if (!deletedJobType) {
-      return NextResponse.json(
-        { error: 'Job type not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      message: 'Job type deleted successfully',
-      jobType: deletedJobType
-    });
-
+    // Soft delete
+    const { data, error } = await supabase.from('cp_job_types')
+      .update({ is_active: false, updated_at: new Date().toISOString() }).eq('mongo_id', params.id).select().single();
+    if (error || !data) return NextResponse.json({ error: 'Job type not found' }, { status: 404 });
+    return NextResponse.json({ message: 'Job type deleted successfully', jobType: toJobType(data) });
   } catch (error: any) {
-    console.error('Error deleting job type:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error?.message || 'Unknown error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error', details: error?.message }, { status: 500 });
   }
 }

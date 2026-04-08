@@ -1,35 +1,28 @@
-import { NextResponse } from "next/server";
-import { dbConnect } from "@/lib/mongo";
-import Row from "@/models/Row";
+import { NextResponse } from 'next/server';
+import { supabase, toRow } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    await dbConnect();
-    
-    // Get all rows
-    const allRows = await Row.find({}).lean();
-    
-    // Get count by sheet
-    const sheetCounts = await Row.aggregate([
-      {
-        $group: {
-          _id: "$sheet",
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-    
+    const { data: allRows, error } = await supabase.from('cp_rows').select('*').limit(5);
+    if (error) throw error;
+
+    const { data: sheetCounts } = await supabase.rpc('get_cp_rows_sheet_counts').catch(() => ({ data: null }));
+
+    // Fallback: manual count per sheet
+    const sheets = ['capacity', 'demand', 'supply', 'projects', 'staff', 'job-database'];
+    const counts: any[] = [];
+    for (const sheet of sheets) {
+      const { count } = await supabase.from('cp_rows').select('*', { count: 'exact', head: true }).eq('sheet', sheet);
+      if (count) counts.push({ _id: sheet, count });
+    }
+
     return NextResponse.json({
       success: true,
-      totalRows: allRows.length,
-      sheetCounts,
-      sampleRows: allRows.slice(0, 5) // First 5 rows as sample
+      totalRows: counts.reduce((sum, c) => sum + c.count, 0),
+      sheetCounts: counts,
+      sampleRows: (allRows || []).map(toRow)
     });
-  } catch (error) {
-    console.error("Test data error:", error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error?.message }, { status: 500 });
   }
 }

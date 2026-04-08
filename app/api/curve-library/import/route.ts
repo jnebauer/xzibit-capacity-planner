@@ -1,25 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/mongo';
-import CurveLibrary from '@/models/CurveLibrary';
+import { supabase, toCurveLibrary } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
-    await dbConnect();
-    
     const body = await request.json();
     const { curveLibrary } = body;
 
     // Clear existing curve library data
-    await CurveLibrary.deleteMany({});
+    await supabase.from('cp_curve_libraries').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
     // Import curve library
     if (curveLibrary && typeof curveLibrary === 'object') {
       const curveDocuments = Object.entries(curveLibrary).map(([name, curves]) => ({
+        mongo_id: Date.now().toString(16) + Math.random().toString(16).slice(2, 10),
         name,
         curves,
       }));
-
-      await CurveLibrary.insertMany(curveDocuments);
+      const { error } = await supabase.from('cp_curve_libraries').insert(curveDocuments);
+      if (error) throw error;
     }
 
     return NextResponse.json({
@@ -27,31 +25,18 @@ export async function POST(request: NextRequest) {
       message: 'Curve library imported successfully',
       curvesCount: Object.keys(curveLibrary || {}).length,
     });
-
-  } catch (error) {
-    console.error('Error importing curve library:', error);
-    return NextResponse.json(
-      { error: 'Failed to import curve library', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Failed to import curve library', details: error?.message }, { status: 500 });
   }
 }
 
 export async function GET() {
   try {
-    await dbConnect();
-    
-    const curves = await CurveLibrary.find({}).sort({ name: 1 });
-
-    return NextResponse.json({
-      curves: curves.map(c => c.toObject()),
-    });
-
-  } catch (error) {
-    console.error('Error fetching curve library:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch curve library', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    const { data, error } = await supabase.from('cp_curve_libraries')
+      .select('*').order('name', { ascending: true });
+    if (error) throw error;
+    return NextResponse.json({ curves: (data || []).map(toCurveLibrary) });
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Failed to fetch curve library', details: error?.message }, { status: 500 });
   }
 }
