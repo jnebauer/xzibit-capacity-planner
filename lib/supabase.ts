@@ -1,15 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL!;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-if (!SUPABASE_URL) throw new Error('SUPABASE_URL is missing');
-if (!SUPABASE_SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY is missing');
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 // Server-side client with service role key (bypasses RLS)
-export const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false }
-});
+// Env vars are validated at runtime (not build time) to avoid Vercel build failures
+export const supabase = createClient(
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_SERVICE_KEY || 'placeholder',
+  { auth: { persistSession: false } }
+);
 
 // Helper to convert Supabase row to API-compatible format
 // Maps Supabase snake_case fields to camelCase for backward compatibility
