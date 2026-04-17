@@ -62,6 +62,16 @@ const CHART_TOOLTIP_STYLE = {
   color: "var(--xz-ink-700)",
 } as const;
 
+// Thresholds mirror the pressure-table traffic-light semantics:
+// >100% over-capacity (coral), >80% at-risk (amber), otherwise
+// on-track (mint). Same breakpoints the old inline-coloured cells
+// used — only the presentation changes.
+function utilisationPillClass(utilisation: number): string {
+  if (utilisation > 100) return 'pill pill--coral';
+  if (utilisation > 80) return 'pill pill--amber';
+  return 'pill pill--mint';
+}
+
 // PROPER LOGIC: Realistic workload distribution
 function processProjectForDashboard(project: any) {
   return {
@@ -783,50 +793,56 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Pressure Weeks Table */}
-      <Card sx={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)", borderRadius: 3 }}>
-        <CardContent sx={{ p: 3 }}>
-                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-             Top Pressure Weeks ({dateRangeFilter === 'next' ? 'Next' : 'Previous'} 12 Months)
-           </Typography>
-          
-          <Table sx={{
-            "& .MuiTableCell-root": { borderBottom: "1px solid #f0f0f0", padding: "12px 16px" },
-            "& .MuiTableHead-root .MuiTableCell-root": { backgroundColor: "#f8f9fa", fontWeight: 600, color: "#495057" },
-          }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Week</TableCell>
-                <TableCell>Demand (h)</TableCell>
-                <TableCell>Capacity (h)</TableCell>
-                <TableCell>Utilization</TableCell>
-                <TableCell>Gap (h)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {pressureWeeks.map((week: any, idx: number) => (
-                <TableRow key={idx} sx={{ "&:hover": { backgroundColor: "#f8f9fa" } }}>
-                  <TableCell sx={{ fontWeight: 500 }}>{week.weekLabel}</TableCell>
-                  <TableCell>{week.totalDemand.toFixed(1)}</TableCell>
-                  <TableCell>{week.totalCapacity.toFixed(1)}</TableCell>
-                  <TableCell sx={{
-                    color: week.utilization > 100 ? "#dc3545" : week.utilization > 80 ? "#ffc107" : "#28a745",
-                    fontWeight: 600,
-                  }}>
+      {/* Pressure weeks panel */}
+      <div className="panel">
+        <div className="group-head" style={{ cursor: 'default' }}>
+          <span className="title-text">Pressure weeks</span>
+          <span className="card-sub">Top 10 weeks by demand/capacity delta</span>
+        </div>
+        <Table
+          sx={{
+            '& .MuiTableHead-root .MuiTableCell-root': {
+              backgroundColor: 'var(--xz-surface-soft)',
+              color: 'var(--xz-ink-500)',
+              fontWeight: 600,
+              fontSize: 12,
+              borderBottom: '1px solid var(--xz-hairline)',
+            },
+            '& .MuiTableCell-root': {
+              borderBottom: '1px solid var(--xz-hairline-soft)',
+            },
+          }}
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell>Week</TableCell>
+              <TableCell>Demand (h)</TableCell>
+              <TableCell>Capacity (h)</TableCell>
+              <TableCell>Utilisation</TableCell>
+              <TableCell>Gap (h)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {pressureWeeks.map((week: any, idx: number) => (
+              <TableRow key={idx}>
+                <TableCell sx={{ fontWeight: 500 }}>{week.weekLabel}</TableCell>
+                <TableCell>{week.totalDemand.toFixed(1)}</TableCell>
+                <TableCell>{week.totalCapacity.toFixed(1)}</TableCell>
+                <TableCell>
+                  <span className={utilisationPillClass(week.utilization)}>
                     {week.utilization}%
-                  </TableCell>
-                  <TableCell sx={{
-                    color: week.gap > 0 ? "#dc3545" : "#28a745",
-                    fontWeight: 600,
-                  }}>
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className={`pill ${week.gap > 0 ? 'pill--coral' : 'pill--mint'}`}>
                     {week.gap.toFixed(1)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </Box>
   );
 }
