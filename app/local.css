@@ -61,3 +61,23 @@
 }
 .build-pill-sep  { color: var(--xz-ink-300); }
 .build-pill-time { color: var(--xz-ink-500); }
+
+/* =========================================================
+   Chart skill palette — bespoke 5-slot palette for demand
+   series that represent the 5 skills (CNC / Build / Paint /
+   AV / Pack & Load). Deliberately NOT reusing semantic status
+   colours (mint/sky/amber/coral/lilac/sun) for data series —
+   chart chrome obeys the status family, but data series
+   inside a chart container may extend beyond it.
+
+   TODO v1.1: propose as standard "chart palette A" so other
+   apps doing similar multi-series charts have a canonical
+   set to start from.
+   ========================================================= */
+:root {
+  --xz-chart-skill-a: #3B82F6;  /* CNC        — sky        */
+  --xz-chart-skill-b: #8B5CF6;  /* Build      — violet     */
+  --xz-chart-skill-c: #EC4899;  /* Paint      — pink       */
+  --xz-chart-skill-d: #F59E0B;  /* AV         — amber-500  */
+  --xz-chart-skill-e: #14B8A6;  /* Pack&Load  — teal-500   */
+}

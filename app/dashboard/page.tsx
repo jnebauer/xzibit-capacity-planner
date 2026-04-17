@@ -37,6 +37,31 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 
+// Chart chrome + series palette tokens. Hex values mirror the
+// --xz-* tokens defined in app/local.css (chart skill palette)
+// and the standard's status family. SVG attributes don't resolve
+// CSS var() so we pass hex literals; the single source of truth
+// is local.css — update both together if the palette shifts.
+const CHART_GRID = "#E2E8F0";       // --xz-hairline
+const CHART_AXIS_TEXT = "#64748B";  // --xz-ink-500
+const CHART_PALETTE = {
+  demand:   "#F87171",  // --xz-coral-500
+  capacity: "#19B1A1",  // --xz-teal
+  cnc:      "#3B82F6",  // --xz-chart-skill-a
+  build:    "#8B5CF6",  // --xz-chart-skill-b
+  paint:    "#EC4899",  // --xz-chart-skill-c
+  av:       "#F59E0B",  // --xz-chart-skill-d
+  packLoad: "#14B8A6",  // --xz-chart-skill-e
+} as const;
+const CHART_TOOLTIP_STYLE = {
+  backgroundColor: "var(--xz-surface)",
+  border: "1px solid var(--xz-hairline)",
+  borderRadius: "var(--xz-r-md)",
+  boxShadow: "var(--xz-shadow-md)",
+  fontSize: 13,
+  color: "var(--xz-ink-700)",
+} as const;
+
 // PROPER LOGIC: Realistic workload distribution
 function processProjectForDashboard(project: any) {
   return {
@@ -593,109 +618,117 @@ export default function Dashboard() {
       </Card>
 
       {/* Chart */}
-      <Card sx={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)", borderRadius: 3 }}>
-        <CardContent sx={{ p: 3 }}>
-                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-             {dateRangeFilter === 'next' ? 'NEXT 12 MONTHS' : 'PREVIOUS 12 MONTHS'} - Capacity vs Demand Overview
-           </Typography>
-          
+      <Card>
+        <CardContent>
+          <div className="card-head">
+            <div>
+              <div className="card-title">Capacity vs demand</div>
+              <div className="card-sub">
+                {dateRangeFilter === 'next' ? 'Next 12 months' : 'Previous 12 months'}
+              </div>
+            </div>
+          </div>
+
           <Box sx={{ height: 500, width: "100%" }}>
             <ResponsiveContainer>
               <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="weekLabel" 
-                  stroke="#666"
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+                <XAxis
+                  dataKey="weekLabel"
+                  stroke={CHART_AXIS_TEXT}
+                  tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
                   tickFormatter={(value, index) => {
                     const week = weeks[index];
                     return week?.isCurrentWeek ? `🔥 ${value}` : value;
                   }}
                 />
-                <YAxis stroke="#666" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: 8,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  }}
+                <YAxis
+                  stroke={CHART_AXIS_TEXT}
+                  tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
                 />
-                <Legend />
-                
+                <Tooltip
+                  contentStyle={CHART_TOOLTIP_STYLE}
+                  labelStyle={{ color: "var(--xz-ink)", fontWeight: 600 }}
+                  cursor={{ stroke: CHART_GRID }}
+                />
+                <Legend
+                  wrapperStyle={{ color: "var(--xz-ink-700)", fontSize: 12 }}
+                />
+
                 {/* Total lines */}
                 <Line
                   type={curveMode === 'adrian' ? "monotone" : "linear"}
                   dataKey="totalDemand"
-                  name="Total Demand (h)"
+                  name="Total demand (h)"
                   strokeWidth={3}
-                  stroke="#ff6b6b"
+                  stroke={CHART_PALETTE.demand}
                   dot={false}
-                  activeDot={{ r: 6, stroke: "#ff6b6b", strokeWidth: 2 }}
+                  activeDot={{ r: 6, stroke: CHART_PALETTE.demand, strokeWidth: 2 }}
                 />
                 <Line
                   type={curveMode === 'adrian' ? "monotone" : "linear"}
                   dataKey="totalCapacity"
-                  name="Total Capacity (h)"
+                  name="Total capacity (h)"
                   strokeWidth={3}
-                  stroke="#4ecdc4"
+                  stroke={CHART_PALETTE.capacity}
                   dot={false}
-                  activeDot={{ r: 6, stroke: "#4ecdc4", strokeWidth: 2 }}
+                  activeDot={{ r: 6, stroke: CHART_PALETTE.capacity, strokeWidth: 2 }}
                 />
-                
+
                 {/* Skill demand lines */}
                 {skillVisibility.CNC && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="cncDemand"
-                    name="CNC Demand"
+                    name="CNC demand"
                     strokeWidth={2}
-                    stroke="#ff9ff3"
+                    stroke={CHART_PALETTE.cnc}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#ff9ff3", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.cnc, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility.Build && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="buildDemand"
-                    name="Build Demand"
+                    name="Build demand"
                     strokeWidth={2}
-                    stroke="#54a0ff"
+                    stroke={CHART_PALETTE.build}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#54a0ff", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.build, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility.Paint && (
                   <Line
                     type={curveMode === 'linear' ? "linear" : "monotone"}
                     dataKey="paintDemand"
-                    name="Paint Demand"
+                    name="Paint demand"
                     strokeWidth={2}
-                    stroke="#ff9f43"
+                    stroke={CHART_PALETTE.paint}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#ff9f43", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.paint, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility.AV && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="avDemand"
-                    name="AV Demand"
+                    name="AV demand"
                     strokeWidth={2}
-                    stroke="#5f27cd"
+                    stroke={CHART_PALETTE.av}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#5f27cd", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.av, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility["Pack & Load"] && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="packLoadDemand"
-                    name="P&L Demand"
+                    name="P&L demand"
                     strokeWidth={2}
-                    stroke="#00d2d3"
+                    stroke={CHART_PALETTE.packLoad}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#00d2d3", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.packLoad, strokeWidth: 1 }}
                   />
                 )}
               </LineChart>
