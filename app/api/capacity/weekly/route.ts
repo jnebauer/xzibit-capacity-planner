@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  fetchCompanyClosures,
+  fetchPlanningStaff,
+  getDateFromISOWeek,
+  getWeekRange,
+  toDate,
+} from '@/lib/capacityPlanning';
+import { calculateWeeklyCapacity, capacityBreakdownToMap } from '@/lib/capacityEngine';
+import { chartLabelForISOWeek } from '@/lib/rulesEngine';
+
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const startDate = toDate(searchParams.get('startDate')) || new Date();
+    const endDate = toDate(searchParams.get('endDate')) || new Date(new Date().setMonth(new Date().getMonth() + 12));
+
+    const [staff, closures] = await Promise.all([
+      fetchPlanningStaff(),
+      fetchCompanyClosures(),
+    ]);
+
+    const weeklyCapacity = calculateWeeklyCapacity(staff, closures, startDate, endDate);
+    const planningWeeks = getWeekRange(startDate, endDate);
+    const capacityByWeek = capacityBreakdownToMap(weeklyCapacity);
+
+    const weeks = planningWeeks.map((isoWeek) => {
+      const weekStart = getDateFromISOWeek(isoWeek);
+      return {
+        isoWeek,
+        label: chartLabelForISOWeek(isoWeek),
+        weekStart: weekStart.toISOString().split('T')[0],
+      };
+    });
+
+    return NextResponse.json({
+      weeks,
+      capacity: capacityByWeek,
+      breakdown: weeklyCapacity,
+      meta: {
+        staffCount: staff.length,
+        closureCount: closures.length,
+      },
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: 'Failed to calculate capacity', details: error?.message || 'Unknown error' },
+      { status: 500 }
+    );
+  }
+}

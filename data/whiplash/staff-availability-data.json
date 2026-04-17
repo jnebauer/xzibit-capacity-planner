@@ -1,0 +1,662 @@
+[
+  {
+    "id": 49,
+    "staffId": 30053,
+    "startDate": "2026-01-23T05:00:00.000Z",
+    "endDate": "2026-01-23T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:11.000Z",
+    "updatedAt": "2026-01-23T14:21:11.000Z"
+  },
+  {
+    "id": 7,
+    "staffId": 30053,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:02.000Z",
+    "updatedAt": "2026-01-23T14:21:02.000Z"
+  },
+  {
+    "id": 50,
+    "staffId": 30053,
+    "startDate": "2026-01-27T05:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:12.000Z",
+    "updatedAt": "2026-01-23T14:21:12.000Z"
+  },
+  {
+    "id": 5,
+    "staffId": 30053,
+    "startDate": "2026-04-03T04:00:00.000Z",
+    "endDate": "2026-04-06T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:02.000Z",
+    "updatedAt": "2026-01-23T14:21:02.000Z"
+  },
+  {
+    "id": 51,
+    "staffId": 30053,
+    "startDate": "2026-04-07T04:00:00.000Z",
+    "endDate": "2027-12-17T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:12.000Z",
+    "updatedAt": "2026-01-23T14:21:12.000Z"
+  },
+  {
+    "id": 6,
+    "staffId": 30053,
+    "startDate": "2026-05-05T04:00:00.000Z",
+    "endDate": "2026-05-05T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:02.000Z",
+    "updatedAt": "2026-01-23T14:21:02.000Z"
+  },
+  {
+    "id": 40,
+    "staffId": 30054,
+    "startDate": "2026-01-23T05:00:00.000Z",
+    "endDate": "2026-01-23T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:09.000Z",
+    "updatedAt": "2026-01-23T14:21:09.000Z"
+  },
+  {
+    "id": 10,
+    "staffId": 30054,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:03.000Z",
+    "updatedAt": "2026-01-23T14:21:03.000Z"
+  },
+  {
+    "id": 41,
+    "staffId": 30054,
+    "startDate": "2026-01-27T05:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:10.000Z",
+    "updatedAt": "2026-01-23T14:21:10.000Z"
+  },
+  {
+    "id": 8,
+    "staffId": 30054,
+    "startDate": "2026-04-03T04:00:00.000Z",
+    "endDate": "2026-04-06T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:03.000Z",
+    "updatedAt": "2026-01-23T14:21:03.000Z"
+  },
+  {
+    "id": 42,
+    "staffId": 30054,
+    "startDate": "2026-04-07T04:00:00.000Z",
+    "endDate": "2027-12-17T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:10.000Z",
+    "updatedAt": "2026-01-23T14:21:10.000Z"
+  },
+  {
+    "id": 9,
+    "staffId": 30054,
+    "startDate": "2026-05-05T04:00:00.000Z",
+    "endDate": "2026-05-05T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:03.000Z",
+    "updatedAt": "2026-01-23T14:21:03.000Z"
+  },
+  {
+    "id": 43,
+    "staffId": 30055,
+    "startDate": "2026-01-23T05:00:00.000Z",
+    "endDate": "2026-01-23T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:10.000Z",
+    "updatedAt": "2026-01-23T14:21:10.000Z"
+  },
+  {
+    "id": 13,
+    "staffId": 30055,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:04.000Z",
+    "updatedAt": "2026-01-23T14:21:04.000Z"
+  },
+  {
+    "id": 44,
+    "staffId": 30055,
+    "startDate": "2026-01-27T05:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:10.000Z",
+    "updatedAt": "2026-01-23T14:21:10.000Z"
+  },
+  {
+    "id": 11,
+    "staffId": 30055,
+    "startDate": "2026-04-03T04:00:00.000Z",
+    "endDate": "2026-04-06T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:03.000Z",
+    "updatedAt": "2026-01-23T14:21:03.000Z"
+  },
+  {
+    "id": 45,
+    "staffId": 30055,
+    "startDate": "2026-04-07T04:00:00.000Z",
+    "endDate": "2027-12-17T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:11.000Z",
+    "updatedAt": "2026-01-23T14:21:11.000Z"
+  },
+  {
+    "id": 12,
+    "staffId": 30055,
+    "startDate": "2026-05-05T04:00:00.000Z",
+    "endDate": "2026-05-05T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:03.000Z",
+    "updatedAt": "2026-01-23T14:21:03.000Z"
+  },
+  {
+    "id": 30001,
+    "staffId": 30056,
+    "startDate": "2026-01-23T05:00:00.000Z",
+    "endDate": "2026-06-30T04:00:00.000Z",
+    "absenceType": "Sick Leave",
+    "reason": "",
+    "createdAt": "2026-01-23T16:52:57.000Z",
+    "updatedAt": "2026-01-23T16:52:57.000Z"
+  },
+  {
+    "id": 18,
+    "staffId": 30056,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:05.000Z",
+    "updatedAt": "2026-01-23T14:21:05.000Z"
+  },
+  {
+    "id": 52,
+    "staffId": 30056,
+    "startDate": "2026-03-09T04:00:00.000Z",
+    "endDate": "2026-04-01T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:12.000Z",
+    "updatedAt": "2026-01-23T14:21:12.000Z"
+  },
+  {
+    "id": 19,
+    "staffId": 30056,
+    "startDate": "2026-04-02T04:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Other Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:05.000Z",
+    "updatedAt": "2026-01-23T14:21:05.000Z"
+  },
+  {
+    "id": 20,
+    "staffId": 30056,
+    "startDate": "2026-04-07T04:00:00.000Z",
+    "endDate": "2026-04-07T04:00:00.000Z",
+    "absenceType": "Other Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:05.000Z",
+    "updatedAt": "2026-01-23T14:21:05.000Z"
+  },
+  {
+    "id": 53,
+    "staffId": 30056,
+    "startDate": "2026-04-08T04:00:00.000Z",
+    "endDate": "2027-12-17T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:12.000Z",
+    "updatedAt": "2026-01-23T14:21:12.000Z"
+  },
+  {
+    "id": 54,
+    "staffId": 30057,
+    "startDate": "2026-01-23T05:00:00.000Z",
+    "endDate": "2026-01-23T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:13.000Z",
+    "updatedAt": "2026-01-23T14:21:13.000Z"
+  },
+  {
+    "id": 23,
+    "staffId": 30057,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:06.000Z",
+    "updatedAt": "2026-01-23T14:21:06.000Z"
+  },
+  {
+    "id": 55,
+    "staffId": 30057,
+    "startDate": "2026-01-27T05:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:13.000Z",
+    "updatedAt": "2026-01-23T14:21:13.000Z"
+  },
+  {
+    "id": 21,
+    "staffId": 30057,
+    "startDate": "2026-04-03T04:00:00.000Z",
+    "endDate": "2026-04-06T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:05.000Z",
+    "updatedAt": "2026-01-23T14:21:05.000Z"
+  },
+  {
+    "id": 56,
+    "staffId": 30057,
+    "startDate": "2026-04-07T04:00:00.000Z",
+    "endDate": "2027-12-17T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:13.000Z",
+    "updatedAt": "2026-01-23T14:21:13.000Z"
+  },
+  {
+    "id": 22,
+    "staffId": 30057,
+    "startDate": "2026-05-05T04:00:00.000Z",
+    "endDate": "2026-05-05T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:06.000Z",
+    "updatedAt": "2026-01-23T14:21:06.000Z"
+  },
+  {
+    "id": 27,
+    "staffId": 30058,
+    "startDate": "2026-01-23T05:00:00.000Z",
+    "endDate": "2026-01-23T05:00:00.000Z",
+    "absenceType": "Not Commenced",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:07.000Z",
+    "updatedAt": "2026-01-23T14:21:07.000Z"
+  },
+  {
+    "id": 26,
+    "staffId": 30058,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:06.000Z",
+    "updatedAt": "2026-01-23T14:21:06.000Z"
+  },
+  {
+    "id": 46,
+    "staffId": 30058,
+    "startDate": "2026-01-27T05:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:11.000Z",
+    "updatedAt": "2026-01-23T14:21:11.000Z"
+  },
+  {
+    "id": 24,
+    "staffId": 30058,
+    "startDate": "2026-04-03T04:00:00.000Z",
+    "endDate": "2026-04-06T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:06.000Z",
+    "updatedAt": "2026-01-23T14:21:06.000Z"
+  },
+  {
+    "id": 47,
+    "staffId": 30058,
+    "startDate": "2026-04-07T04:00:00.000Z",
+    "endDate": "2027-12-17T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:11.000Z",
+    "updatedAt": "2026-01-23T14:21:11.000Z"
+  },
+  {
+    "id": 25,
+    "staffId": 30058,
+    "startDate": "2026-05-05T04:00:00.000Z",
+    "endDate": "2026-05-05T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:06.000Z",
+    "updatedAt": "2026-01-23T14:21:06.000Z"
+  },
+  {
+    "id": 57,
+    "staffId": 30060,
+    "startDate": "2026-01-23T05:00:00.000Z",
+    "endDate": "2026-01-23T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:13.000Z",
+    "updatedAt": "2026-01-23T14:21:13.000Z"
+  },
+  {
+    "id": 31,
+    "staffId": 30060,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:08.000Z",
+    "updatedAt": "2026-01-23T14:21:08.000Z"
+  },
+  {
+    "id": 58,
+    "staffId": 30060,
+    "startDate": "2026-01-27T05:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:13.000Z",
+    "updatedAt": "2026-01-23T14:21:13.000Z"
+  },
+  {
+    "id": 29,
+    "staffId": 30060,
+    "startDate": "2026-04-03T04:00:00.000Z",
+    "endDate": "2026-04-06T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:07.000Z",
+    "updatedAt": "2026-01-23T14:21:07.000Z"
+  },
+  {
+    "id": 59,
+    "staffId": 30060,
+    "startDate": "2026-04-07T04:00:00.000Z",
+    "endDate": "2027-12-17T05:00:00.000Z",
+    "absenceType": "Available",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:14.000Z",
+    "updatedAt": "2026-01-23T14:21:14.000Z"
+  },
+  {
+    "id": 30,
+    "staffId": 30060,
+    "startDate": "2026-05-05T04:00:00.000Z",
+    "endDate": "2026-05-05T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:07.000Z",
+    "updatedAt": "2026-01-23T14:21:07.000Z"
+  },
+  {
+    "id": 37,
+    "staffId": 30061,
+    "startDate": "2026-01-26T05:00:00.000Z",
+    "endDate": "2026-01-26T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:09.000Z",
+    "updatedAt": "2026-01-23T14:21:09.000Z"
+  },
+  {
+    "id": 33,
+    "staffId": 30061,
+    "startDate": "2026-01-27T05:00:00.000Z",
+    "endDate": "2026-04-02T04:00:00.000Z",
+    "absenceType": "Workers Compensation",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:08.000Z",
+    "updatedAt": "2026-01-23T14:21:08.000Z"
+  },
+  {
+    "id": 35,
+    "staffId": 30061,
+    "startDate": "2026-04-03T04:00:00.000Z",
+    "endDate": "2026-04-06T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:08.000Z",
+    "updatedAt": "2026-01-23T14:21:08.000Z"
+  },
+  {
+    "id": 36,
+    "staffId": 30061,
+    "startDate": "2026-05-05T04:00:00.000Z",
+    "endDate": "2026-05-05T04:00:00.000Z",
+    "absenceType": "Public Holiday",
+    "reason": null,
+    "createdAt": "2026-01-23T14:21:09.000Z",
+    "updatedAt": "2026-01-23T14:21:09.000Z"
+  },
+  {
+    "id": 150007,
+    "staffId": 210001,
+    "startDate": "2024-08-07T04:00:00.000Z",
+    "endDate": "2024-08-07T04:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Annual Leave (from WhipIt)",
+    "createdAt": "2026-03-10T08:41:49.000Z",
+    "updatedAt": "2026-03-10T08:41:49.000Z"
+  },
+  {
+    "id": 150005,
+    "staffId": 240003,
+    "startDate": "2024-08-13T04:00:00.000Z",
+    "endDate": "2024-08-15T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": "Annual Leave (from WhipIt)",
+    "createdAt": "2026-03-10T08:39:23.000Z",
+    "updatedAt": "2026-03-10T08:39:23.000Z"
+  },
+  {
+    "id": 150008,
+    "staffId": 690023,
+    "startDate": "2026-01-20T05:00:00.000Z",
+    "endDate": "2026-01-20T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Annual Leave (from WhipIt)",
+    "createdAt": "2026-03-10T08:42:58.000Z",
+    "updatedAt": "2026-03-10T08:42:58.000Z"
+  },
+  {
+    "id": 150006,
+    "staffId": 690028,
+    "startDate": "2024-01-02T05:00:00.000Z",
+    "endDate": "2024-01-06T05:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Annual Leave (from WhipIt)",
+    "createdAt": "2026-03-10T08:40:41.000Z",
+    "updatedAt": "2026-03-10T08:40:41.000Z"
+  },
+  {
+    "id": 150004,
+    "staffId": 700005,
+    "startDate": "2024-08-07T04:00:00.000Z",
+    "endDate": "2024-08-08T04:00:00.000Z",
+    "absenceType": "Available",
+    "reason": "Annual Leave (from WhipIt)",
+    "createdAt": "2026-03-10T08:38:12.000Z",
+    "updatedAt": "2026-03-10T08:38:12.000Z"
+  },
+  {
+    "id": 180001,
+    "staffId": 1200003,
+    "startDate": "2024-08-20T00:00:00.000Z",
+    "endDate": "2024-08-20T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:20.000Z",
+    "updatedAt": "2026-03-10T14:47:20.000Z"
+  },
+  {
+    "id": 180002,
+    "staffId": 1200003,
+    "startDate": "2024-08-22T00:00:00.000Z",
+    "endDate": "2024-08-24T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:20.000Z",
+    "updatedAt": "2026-03-10T14:47:20.000Z"
+  },
+  {
+    "id": 180003,
+    "staffId": 1200003,
+    "startDate": "2025-12-16T00:00:00.000Z",
+    "endDate": "2025-12-20T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:20.000Z",
+    "updatedAt": "2026-03-10T14:47:20.000Z"
+  },
+  {
+    "id": 180004,
+    "staffId": 1200003,
+    "startDate": "2025-12-23T00:00:00.000Z",
+    "endDate": "2025-12-27T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:20.000Z",
+    "updatedAt": "2026-03-10T14:47:20.000Z"
+  },
+  {
+    "id": 180005,
+    "staffId": 1200004,
+    "startDate": "2025-11-18T00:00:00.000Z",
+    "endDate": "2025-11-18T00:00:00.000Z",
+    "absenceType": "Other Leave",
+    "reason": "Imported from WhipIt (TEST)",
+    "createdAt": "2026-03-10T14:47:22.000Z",
+    "updatedAt": "2026-03-10T14:47:22.000Z"
+  },
+  {
+    "id": 180006,
+    "staffId": 1200004,
+    "startDate": "2025-12-16T00:00:00.000Z",
+    "endDate": "2025-12-20T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:22.000Z",
+    "updatedAt": "2026-03-10T14:47:22.000Z"
+  },
+  {
+    "id": 180007,
+    "staffId": 1200004,
+    "startDate": "2025-12-23T00:00:00.000Z",
+    "endDate": "2025-12-27T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:22.000Z",
+    "updatedAt": "2026-03-10T14:47:22.000Z"
+  },
+  {
+    "id": 180008,
+    "staffId": 1200005,
+    "startDate": "2025-12-16T00:00:00.000Z",
+    "endDate": "2025-12-20T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:24.000Z",
+    "updatedAt": "2026-03-10T14:47:24.000Z"
+  },
+  {
+    "id": 180009,
+    "staffId": 1200005,
+    "startDate": "2025-12-23T00:00:00.000Z",
+    "endDate": "2025-12-27T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:24.000Z",
+    "updatedAt": "2026-03-10T14:47:24.000Z"
+  },
+  {
+    "id": 180010,
+    "staffId": 1200006,
+    "startDate": "2024-01-03T00:00:00.000Z",
+    "endDate": "2024-01-03T00:00:00.000Z",
+    "absenceType": "Other Leave",
+    "reason": "Imported from WhipIt (Also c)",
+    "createdAt": "2026-03-10T14:47:25.000Z",
+    "updatedAt": "2026-03-10T14:47:25.000Z"
+  },
+  {
+    "id": 180011,
+    "staffId": 1200006,
+    "startDate": "2025-12-16T00:00:00.000Z",
+    "endDate": "2025-12-20T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:26.000Z",
+    "updatedAt": "2026-03-10T14:47:26.000Z"
+  },
+  {
+    "id": 180012,
+    "staffId": 1200006,
+    "startDate": "2025-12-23T00:00:00.000Z",
+    "endDate": "2025-12-27T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:26.000Z",
+    "updatedAt": "2026-03-10T14:47:26.000Z"
+  },
+  {
+    "id": 180013,
+    "staffId": 1200007,
+    "startDate": "2024-08-12T00:00:00.000Z",
+    "endDate": "2024-08-18T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (Xmas Leave)",
+    "createdAt": "2026-03-10T14:47:27.000Z",
+    "updatedAt": "2026-03-10T14:47:27.000Z"
+  },
+  {
+    "id": 180014,
+    "staffId": 1200007,
+    "startDate": "2025-12-16T00:00:00.000Z",
+    "endDate": "2025-12-20T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:27.000Z",
+    "updatedAt": "2026-03-10T14:47:27.000Z"
+  },
+  {
+    "id": 180015,
+    "staffId": 1200007,
+    "startDate": "2025-12-23T00:00:00.000Z",
+    "endDate": "2025-12-27T00:00:00.000Z",
+    "absenceType": "Annual Leave",
+    "reason": "Imported from WhipIt (XMAS)",
+    "createdAt": "2026-03-10T14:47:27.000Z",
+    "updatedAt": "2026-03-10T14:47:27.000Z"
+  }
+]

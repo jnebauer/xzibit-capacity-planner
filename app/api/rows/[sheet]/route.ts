@@ -8,9 +8,10 @@ const deleteRowSchema = z.object({ _id: z.string() });
 
 const VALID_SHEETS = ['capacity', 'demand', 'supply', 'projects', 'staff', 'job-database'];
 
-export async function GET(request: NextRequest, { params }: { params: { sheet: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ sheet: string }> }) {
+  const { sheet } = await context.params;
   try {
-    if (!VALID_SHEETS.includes(params.sheet)) {
+    if (!VALID_SHEETS.includes(sheet)) {
       return NextResponse.json({ ok: false, error: 'Unknown sheet' }, { status: 404 });
     }
     const { searchParams } = new URL(request.url);
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest, { params }: { params: { sheet: s
 
     const { data, error, count } = await supabase.from('cp_rows')
       .select('*', { count: 'exact' })
-      .eq('sheet', params.sheet)
+      .eq('sheet', sheet)
       .order('row_number', { ascending: true })
       .range(from, to);
 
@@ -36,9 +37,10 @@ export async function GET(request: NextRequest, { params }: { params: { sheet: s
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { sheet: string } }) {
+export async function POST(request: NextRequest, context: { params: Promise<{ sheet: string }> }) {
+  const { sheet } = await context.params;
   try {
-    if (!VALID_SHEETS.includes(params.sheet)) {
+    if (!VALID_SHEETS.includes(sheet)) {
       return NextResponse.json({ ok: false, error: 'Unknown sheet' }, { status: 404 });
     }
     const body = await request.json();
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: { sheet: 
     const mongoId = Date.now().toString(16) + Math.random().toString(16).slice(2, 10);
     const { data, error } = await supabase.from('cp_rows').insert({
       mongo_id: mongoId,
-      sheet: params.sheet,
+      sheet,
       data: validated.data,
       synced: false,
     }).select().single();
@@ -58,9 +60,10 @@ export async function POST(request: NextRequest, { params }: { params: { sheet: 
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { sheet: string } }) {
+export async function PATCH(request: NextRequest, context: { params: Promise<{ sheet: string }> }) {
+  const { sheet } = await context.params;
   try {
-    if (!VALID_SHEETS.includes(params.sheet)) {
+    if (!VALID_SHEETS.includes(sheet)) {
       return NextResponse.json({ ok: false, error: 'Unknown sheet' }, { status: 404 });
     }
     const body = await request.json();
@@ -83,9 +86,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { sheet:
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { sheet: string } }) {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ sheet: string }> }) {
+  const { sheet } = await context.params;
   try {
-    if (!VALID_SHEETS.includes(params.sheet)) {
+    if (!VALID_SHEETS.includes(sheet)) {
       return NextResponse.json({ ok: false, error: 'Unknown sheet' }, { status: 404 });
     }
     const body = await request.json();

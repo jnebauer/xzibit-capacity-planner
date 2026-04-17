@@ -11,6 +11,12 @@ export const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
+function normalizeRatio(value: any) {
+  const numeric = Number(value ?? 0);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 0;
+  return numeric > 1 ? Math.min(numeric / 100, 1) : Math.min(numeric, 1);
+}
+
 // Helper to convert Supabase row to API-compatible format
 // Maps Supabase snake_case fields to camelCase for backward compatibility
 export function toProject(row: any) {
@@ -87,12 +93,16 @@ export function toStaff(row: any, leaveRows: any[] = []) {
     slug: row.slug,
     name: row.name,
     dailyHours: row.daily_hours,
-    utilisation: row.utilisation,
+    utilisation: normalizeRatio(row.utilisation),
+    employeeType: row.employee_type || row.employeeType || 'employee',
     skills: row.skills,
     leave: leaveRows.map(l => ({
       _id: l.id,
-      date: l.date,
-      leaveType: l.leave_type,
+      date: l.date || l.start_date,
+      startDate: l.start_date || l.date,
+      endDate: l.end_date || l.date,
+      leaveType: l.leave_type || l.absence_type,
+      absenceType: l.absence_type || l.leave_type,
       notes: l.notes,
     })),
     createdAt: row.created_at,

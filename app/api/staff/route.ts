@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, toStaff } from '@/lib/supabase';
 
+function normalizeUtilisation(value: any) {
+  const numeric = Number(value ?? 0.85);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 0.85;
+  return numeric > 1 ? Math.min(numeric / 100, 1) : Math.min(numeric, 1);
+}
+
 export async function GET() {
   try {
     const { data: staffData, error } = await supabase.from('cp_staff')
@@ -32,7 +38,8 @@ export async function POST(request: NextRequest) {
       slug: body.slug || body.name.toLowerCase().replace(/\s+/g, '_'),
       name: body.name,
       daily_hours: body.dailyHours || 8,
-      utilisation: body.utilisation || 0.8,
+      utilisation: normalizeUtilisation(body.utilisation),
+      employee_type: body.employeeType === 'contractor' ? 'contractor' : 'employee',
       skills: body.skills || { CNC: false, Build: false, Paint: false, AV: false, 'Pack & Load': false },
     }).select().single();
 
