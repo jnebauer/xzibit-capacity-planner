@@ -27,3 +27,37 @@
      - DataGrid N-column / sticky-left variant (same need as
        Team Schedule's .schedule-grid).
    ========================================================= */
+
+/* =========================================================
+   Build/version pill — sits in the topbar's right edge.
+   Mirrors Team Schedule's .build-pill composition 1:1 so the
+   two apps render the same chip.
+   TODO v1.1: upstream to standard as a "version badge" —
+   small monospace SHA + separator + optional env suffix.
+   ========================================================= */
+.build-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--xz-r-pill);
+  background: var(--xz-surface);
+  border: 1px solid var(--xz-hairline);
+  color: var(--xz-ink-500);
+  font-size: 11px;
+  text-decoration: none;
+  box-shadow: var(--xz-shadow-sm);
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+.build-pill:hover {
+  background: var(--xz-surface-soft);
+  color: var(--xz-ink);
+  border-color: var(--xz-ink-300);
+}
+.build-pill-sha {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--xz-ink);
+  font-weight: 600;
+}
+.build-pill-sep  { color: var(--xz-ink-300); }
+.build-pill-time { color: var(--xz-ink-500); }
