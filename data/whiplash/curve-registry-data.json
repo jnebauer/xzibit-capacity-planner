@@ -1,0 +1,407 @@
+[
+  {
+    "id": 1,
+    "jobType": "Custom Exhibition Large",
+    "taskType": "AV",
+    "defaultCurveId": "Custom-Exhibition-Large-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 23,
+    "jobType": "Custom Exhibition Large",
+    "taskType": "Build",
+    "defaultCurveId": "Custom-Exhibition-Large-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 24,
+    "jobType": "Custom Exhibition Large",
+    "taskType": "CNC",
+    "defaultCurveId": "Custom-Exhibition-Large-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 45,
+    "jobType": "Custom Exhibition Large",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Custom-Exhibition-Large-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 7,
+    "jobType": "Custom Exhibition Large",
+    "taskType": "Paint",
+    "defaultCurveId": "Custom-Exhibition-Large-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 25,
+    "jobType": "Custom Exhibition Medium",
+    "taskType": "AV",
+    "defaultCurveId": "Custom-Exhibition-Medium-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 10,
+    "jobType": "Custom Exhibition Medium",
+    "taskType": "Build",
+    "defaultCurveId": "Custom-Exhibition-Medium-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 12,
+    "jobType": "Custom Exhibition Medium",
+    "taskType": "CNC",
+    "defaultCurveId": "Custom-Exhibition-Medium-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 40,
+    "jobType": "Custom Exhibition Medium",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Custom-Exhibition-Medium-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 34,
+    "jobType": "Custom Exhibition Medium",
+    "taskType": "Paint",
+    "defaultCurveId": "Custom-Exhibition-Medium-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 30,
+    "jobType": "Custom Exhibition Small",
+    "taskType": "AV",
+    "defaultCurveId": "Custom-Exhibition-Small-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 17,
+    "jobType": "Custom Exhibition Small",
+    "taskType": "Build",
+    "defaultCurveId": "Custom-Exhibition-Small-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 16,
+    "jobType": "Custom Exhibition Small",
+    "taskType": "CNC",
+    "defaultCurveId": "Custom-Exhibition-Small-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 42,
+    "jobType": "Custom Exhibition Small",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Custom-Exhibition-Small-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 18,
+    "jobType": "Custom Exhibition Small",
+    "taskType": "Paint",
+    "defaultCurveId": "Custom-Exhibition-Small-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 21,
+    "jobType": "Exhibition Hire Large",
+    "taskType": "AV",
+    "defaultCurveId": "Exhibition-Hire-Large-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 43,
+    "jobType": "Exhibition Hire Large",
+    "taskType": "Build",
+    "defaultCurveId": "Exhibition-Hire-Large-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 39,
+    "jobType": "Exhibition Hire Large",
+    "taskType": "CNC",
+    "defaultCurveId": "Exhibition-Hire-Large-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 26,
+    "jobType": "Exhibition Hire Large",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Exhibition-Hire-Large-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 11,
+    "jobType": "Exhibition Hire Large",
+    "taskType": "Paint",
+    "defaultCurveId": "Exhibition-Hire-Large-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 41,
+    "jobType": "Exhibition Hire Medium",
+    "taskType": "AV",
+    "defaultCurveId": "Exhibition-Hire-Medium-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 32,
+    "jobType": "Exhibition Hire Medium",
+    "taskType": "Build",
+    "defaultCurveId": "Exhibition-Hire-Medium-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 6,
+    "jobType": "Exhibition Hire Medium",
+    "taskType": "CNC",
+    "defaultCurveId": "Exhibition-Hire-Medium-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 5,
+    "jobType": "Exhibition Hire Medium",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Exhibition-Hire-Medium-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 2,
+    "jobType": "Exhibition Hire Medium",
+    "taskType": "Paint",
+    "defaultCurveId": "Exhibition-Hire-Medium-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 44,
+    "jobType": "Exhibition Hire Small",
+    "taskType": "AV",
+    "defaultCurveId": "Exhibition-Hire-Small-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 3,
+    "jobType": "Exhibition Hire Small",
+    "taskType": "Build",
+    "defaultCurveId": "Exhibition-Hire-Small-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 31,
+    "jobType": "Exhibition Hire Small",
+    "taskType": "CNC",
+    "defaultCurveId": "Exhibition-Hire-Small-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 29,
+    "jobType": "Exhibition Hire Small",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Exhibition-Hire-Small-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 33,
+    "jobType": "Exhibition Hire Small",
+    "taskType": "Paint",
+    "defaultCurveId": "Exhibition-Hire-Small-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 13,
+    "jobType": "Museum Large",
+    "taskType": "AV",
+    "defaultCurveId": "Museum-Large-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 38,
+    "jobType": "Museum Large",
+    "taskType": "Build",
+    "defaultCurveId": "Museum-Large-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 27,
+    "jobType": "Museum Large",
+    "taskType": "CNC",
+    "defaultCurveId": "Museum-Large-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 37,
+    "jobType": "Museum Large",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Museum-Large-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 9,
+    "jobType": "Museum Large",
+    "taskType": "Paint",
+    "defaultCurveId": "Museum-Large-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 28,
+    "jobType": "Museum Medium",
+    "taskType": "AV",
+    "defaultCurveId": "Museum-Medium-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 8,
+    "jobType": "Museum Medium",
+    "taskType": "Build",
+    "defaultCurveId": "Museum-Medium-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 4,
+    "jobType": "Museum Medium",
+    "taskType": "CNC",
+    "defaultCurveId": "Museum-Medium-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 19,
+    "jobType": "Museum Medium",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Museum-Medium-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 14,
+    "jobType": "Museum Medium",
+    "taskType": "Paint",
+    "defaultCurveId": "Museum-Medium-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 20,
+    "jobType": "Museum Small",
+    "taskType": "AV",
+    "defaultCurveId": "Museum-Small-AV-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 36,
+    "jobType": "Museum Small",
+    "taskType": "Build",
+    "defaultCurveId": "Museum-Small-Build-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 15,
+    "jobType": "Museum Small",
+    "taskType": "CNC",
+    "defaultCurveId": "Museum-Small-CNC-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 35,
+    "jobType": "Museum Small",
+    "taskType": "Pack & Load",
+    "defaultCurveId": "Museum-Small-Pack-&-Load-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  },
+  {
+    "id": 22,
+    "jobType": "Museum Small",
+    "taskType": "Paint",
+    "defaultCurveId": "Museum-Small-Paint-v1",
+    "reason": "Auto-populated from existing curves",
+    "createdAt": "2026-02-01T15:00:41.000Z",
+    "updatedAt": "2026-02-01T15:00:41.000Z"
+  }
+]

@@ -304,105 +304,132 @@ export default function Dashboard() {
   const { data: projectsData, isLoading: projectsLoading, error: projectsError } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
-      try {
-        const response = await fetch("/api/projects");
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || "Failed to fetch projects");
-        }
-        return response.json();
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        throw error;
+      const response = await fetch("/api/projects");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to fetch projects");
       }
+      return response.json();
     },
     retry: 2,
     retryDelay: 1000,
   });
 
-  const { data: staffData, isLoading: staffLoading, error: staffError } = useQuery({
-    queryKey: ["staff"],
+  const { data: planningDemandData, isLoading: demandLoading, error: demandError } = useQuery({
+    queryKey: ["planning-demand", startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'), probability, includeOnsite],
     queryFn: async () => {
-      try {
-        const response = await fetch("/api/staff");
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || "Failed to fetch staff");
-        }
-        return response.json();
-      } catch (error) {
-        console.error("Error fetching staff:", error);
-        throw error;
+      const response = await fetch("/api/demand/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          startDate: startDate.format('YYYY-MM-DD'),
+          endDate: endDate.format('YYYY-MM-DD'),
+          probabilityThreshold: probability,
+          includeOnsite,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to calculate demand");
       }
+
+      return response.json();
+    },
+    retry: 2,
+    retryDelay: 1000,
+  });
+
+  const { data: planningCapacityData, isLoading: capacityLoading, error: capacityError } = useQuery({
+    queryKey: ["planning-capacity", startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')],
+    queryFn: async () => {
+      const response = await fetch(`/api/capacity/weekly?startDate=${startDate.format('YYYY-MM-DD')}&endDate=${endDate.format('YYYY-MM-DD')}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to calculate capacity");
+      }
+      return response.json();
     },
     retry: 2,
     retryDelay: 1000,
   });
 
   const projects = projectsData || [];
-  const staff = staffData || [];
+  const staffCount = planningCapacityData?.meta?.staffCount || 0;
 
-  // Proper project filtering - EXCLUDE incomplete data projects
+  const completeProjects = useMemo(() => {
+    return projects.filter((project: any) => hasCompleteData(project));
+  }, [projects]);
+
   const filteredProjects = useMemo(() => {
-    return projects.filter((project: any) => {
-      // Filter by probability
+    return completeProjects.filter((project: any) => {
       if (project.probability !== null && project.probability !== undefined) {
-        if (project.probability < probability / 100) return false;
+        const projectProbability = project.probability > 1 ? project.probability : project.probability * 100;
+        if (projectProbability < probability) return false;
       }
-      
-      // ONLY include projects with complete data
-      return hasCompleteData(project);
+      return true;
     });
-  }, [projects, probability]);
+  }, [completeProjects, probability]);
 
-  // Generate timeline weeks
   const weeks = useMemo(() => {
-    return generateTimelineWeeks(startDate.toDate(), endDate.toDate());
-  }, [startDate, endDate]);
+    return (planningDemandData?.weeks || planningCapacityData?.weeks || []).map((week: any) => {
+      const weekDate = dayjs(week.weekStart);
+      const weekEnd = weekDate.add(6, 'day');
+      return {
+        weekLabel: week.label,
+        weekStart: week.isoWeek,
+        weekStartDate: week.weekStart,
+        weekEnd: weekEnd.format('YYYY-MM-DD'),
+        weekNumber: week.isoWeek,
+        month: weekDate.format('MM'),
+        year: Number(weekDate.format('YYYY')),
+        isCurrentWeek: dayjs().isSame(weekDate, 'week'),
+      };
+    });
+  }, [planningDemandData, planningCapacityData]);
 
-  // Calculate demand and capacity with curve selection
-  const demand = useMemo(() => {
-    return calculateWeeklyDemand(filteredProjects, weeks, includeOnsite, curveMode);
-  }, [filteredProjects, weeks, includeOnsite, curveMode]);
+  const demand = planningDemandData?.demand || {
+    cnc: {},
+    build: {},
+    paint: {},
+    av: {},
+    packAndLoad: {},
+    onsite: {},
+    total: {},
+  };
 
-  const capacity = useMemo(() => {
-    return calculateWeeklyCapacity(staff, weeks);
-  }, [staff, weeks]);
+  const capacity = useMemo(() => ({
+    total: planningCapacityData?.capacity || {},
+  }), [planningCapacityData]);
 
-  // Chart data preparation
   const chartData = useMemo(() => {
-    return weeks.map((week, index) => ({
+    return weeks.map((week: any) => ({
       weekLabel: week.weekLabel,
       weekISO: week.weekStart,
-      // Total values
       totalDemand: Number((demand.total[week.weekStart] || 0).toFixed(1)),
       totalCapacity: Number((capacity.total[week.weekStart] || 0).toFixed(1)),
-      // Skill-specific demand
       cncDemand: Number((demand.cnc[week.weekStart] || 0).toFixed(1)),
       buildDemand: Number((demand.build[week.weekStart] || 0).toFixed(1)),
       paintDemand: Number((demand.paint[week.weekStart] || 0).toFixed(1)),
       avDemand: Number((demand.av[week.weekStart] || 0).toFixed(1)),
       packLoadDemand: Number((demand.packAndLoad[week.weekStart] || 0).toFixed(1)),
-      // Utilization
-      utilization: capacity.total[week.weekStart] > 0 
+      utilization: capacity.total[week.weekStart] > 0
         ? Number(((demand.total[week.weekStart] / capacity.total[week.weekStart]) * 100).toFixed(1))
-        : 0
+        : 0,
     }));
   }, [weeks, demand, capacity]);
 
-  // NEW: Simple pressure weeks calculation
   const pressureWeeks = useMemo(() => {
     return chartData
-      .map(week => ({
+      .map((week: any) => ({
         ...week,
         gap: week.totalDemand - week.totalCapacity
       }))
-      .sort((a, b) => b.gap - a.gap)
+      .sort((a: any, b: any) => b.gap - a.gap)
       .slice(0, 10);
   }, [chartData]);
 
-  // Loading and error states
-  if (projectsLoading || staffLoading) {
+  if (projectsLoading || demandLoading || capacityLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress />
@@ -410,18 +437,20 @@ export default function Dashboard() {
     );
   }
 
-  if (projectsError || staffError) {
-    const errorMessage = projectsError 
+  if (projectsError || demandError || capacityError) {
+    const errorMessage = projectsError
       ? (projectsError as Error).message || "Failed to load projects"
-      : (staffError as Error).message || "Failed to load staff";
-    
+      : demandError
+        ? (demandError as Error).message || "Failed to calculate demand"
+        : (capacityError as Error).message || "Failed to calculate capacity";
+
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error" sx={{ mb: 2 }}>
           {errorMessage}
         </Alert>
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           onClick={() => {
             window.location.reload();
           }}
@@ -558,7 +587,6 @@ export default function Dashboard() {
               />
             </Box>
 
-            {/* Curve Selection */}
             <Box sx={{ 
               display: "flex", 
               flexDirection: "column", 
@@ -568,41 +596,14 @@ export default function Dashboard() {
               backgroundColor: "rgba(255,255,255,0.05)",
               borderRadius: 1,
               border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "140px"
+              minWidth: "160px"
             }}>
               <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 0.5, textAlign: "center", fontSize: "0.7rem" }}>
-                Curve Selection
+                Demand Engine
               </Typography>
-              <ToggleButtonGroup
-                value={curveMode}
-                exclusive
-                onChange={(_, newMode) => newMode && setCurveMode(newMode)}
-                size="small"
-                sx={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  "& .MuiToggleButton-root": {
-                    color: "rgba(255,255,255,0.8)",
-                    borderColor: "rgba(255,255,255,0.2)",
-                    fontSize: "0.55rem",
-                    px: 0.6,
-                    py: 0.3,
-                    minWidth: "45px",
-                    "&.Mui-selected": {
-                      backgroundColor: "rgba(255,255,255,0.2)",
-                      color: "white",
-                      fontWeight: 600,
-                    },
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.15)",
-                    },
-                  },
-                }}
-              >
-                <ToggleButton value="adrian">Adrian</ToggleButton>
-                <ToggleButton value="flat">Flat</ToggleButton>
-                <ToggleButton value="linear">Linear</ToggleButton>
-              </ToggleButtonGroup>
+              <Typography variant="caption" sx={{ color: "white", textAlign: "center", fontSize: "0.6rem", lineHeight: 1.4 }}>
+                Whiplash curve-based planning active
+              </Typography>
             </Box>
 
             {/* Quick Date Range */}
@@ -787,7 +788,7 @@ export default function Dashboard() {
                 <Box sx={{ width: "1px", height: "14px", backgroundColor: "rgba(255,255,255,0.2)" }} />
                 <Box sx={{ textAlign: "center" }}>
                   <Typography variant="h6" sx={{ color: "white", fontWeight: 600, mb: 0, fontSize: "0.9rem" }}>
-                    {staff.length}
+                    {staffCount}
                   </Typography>
                   <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.5rem" }}>
                     Staff
@@ -932,7 +933,7 @@ export default function Dashboard() {
               <strong>Total Projects:</strong> {projects.length} | <strong>Filtered Projects (Complete Data Only):</strong> {filteredProjects.length}
             </Typography>
             <Typography variant="body2">
-              <strong>Total Staff:</strong> {staff.length}
+              <strong>Total Staff:</strong> {staffCount}
             </Typography>
             <Typography variant="body2">
               <strong>Weeks Generated:</strong> {weeks.length}
@@ -944,23 +945,24 @@ export default function Dashboard() {
               <strong>First Week Capacity:</strong> {weeks.length > 0 ? (capacity.total[weeks[0].weekStart] || 0) : 0} hours
             </Typography>
             <Typography variant="body2">
-              <strong>Current Week:</strong> {weeks.find(w => w.isCurrentWeek)?.weekLabel || 'Not in range'}
+              <strong>Current Week:</strong> {weeks.find((w: any) => w.isCurrentWeek)?.weekLabel || 'Not in range'}
             </Typography>
                          <Typography variant="body2">
                <strong>Timeline:</strong> {startDate.format('DD/MM/YYYY')} to {endDate.format('DD/MM/YYYY')}
              </Typography>
              <Typography variant="body2">
-               <strong>Curve Mode:</strong> {curveMode === 'adrian' ? 'Adrian (Mathematician)' : curveMode === 'flat' ? 'Flat (Even Distribution)' : 'Linear (Increasing)'}
+               <strong>Demand Engine:</strong> Whiplash curve-based distribution
              </Typography>
              <Typography variant="body2">
-               <strong>Projects Excluded (Incomplete Data):</strong> {projects.length - filteredProjects.length}
+               <strong>Projects Excluded (Incomplete Data):</strong> {projects.length - completeProjects.length}
              </Typography>
              <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
-               Note: Only projects with complete data (truck load date, weeks to build, and skill hours) are shown on the graph
+               Note: Only projects with complete data (truck load date, weeks to build, and skill hours) are included in the planning engine
              </Typography>
-             <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
-               Note: Capacity line adjusts based on employee leave dates (shows 0 hours when staff are on leave)
-             </Typography>
+              <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
+                Note: Capacity line now applies utilisation, date-range leave, contractor bookings, and company closures where data exists
+              </Typography>
+
           </Box>
         </CardContent>
       </Card>
@@ -986,7 +988,7 @@ export default function Dashboard() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {pressureWeeks.map((week, idx) => (
+              {pressureWeeks.map((week: any, idx: number) => (
                 <TableRow key={idx} sx={{ "&:hover": { backgroundColor: "#f8f9fa" } }}>
                   <TableCell sx={{ fontWeight: 500 }}>{week.weekLabel}</TableCell>
                   <TableCell>{week.totalDemand.toFixed(1)}</TableCell>

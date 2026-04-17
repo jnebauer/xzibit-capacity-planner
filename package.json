@@ -14,7 +14,8 @@
     "extract-old-data": "node scripts/extract-old-data.js",
     "import-to-mongo": "node scripts/import-to-mongo.js",
     "import-json-files": "node scripts/import-json-files.js",
-    "verify-import": "node scripts/verify-import.js"
+    "verify-import": "node scripts/verify-import.js",
+    "seed-phase1-data": "node scripts/seed-phase1-data.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -26,12 +27,14 @@
     "@supabase/supabase-js": "^2.102.1",
     "@tanstack/react-query": "^5.8.0",
     "@tanstack/react-query-devtools": "^5.8.0",
+    "@types/mongoose": "^5.11.97",
     "axios": "^1.6.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.18",
     "dotenv": "^17.2.2",
     "googleapis": "^128.0.0",
     "lodash": "^4.17.21",
+    "mongoose": "^9.4.1",
     "next": "^15.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -47,6 +50,7 @@
     "eslint": "^8.55.0",
     "eslint-config-next": "14.0.4",
     "prettier": "^3.1.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vitest": "^4.1.4"
   }
 }
