@@ -170,12 +170,9 @@ export default function JobTypes() {
       width: 120,
       editable: false,
       renderCell: (params) => (
-        <Chip 
-          label={params.value ? "Active" : "Inactive"} 
-          size="small" 
-          color={params.value ? "success" : "default"}
-          variant="outlined"
-        />
+        <span className={params.value ? 'pill pill--mint' : 'pill pill--muted'}>
+          {params.value ? 'Active' : 'Inactive'}
+        </span>
       ),
     },
     {
@@ -221,34 +218,22 @@ export default function JobTypes() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Card sx={{ 
-        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        borderRadius: 3,
-        transition: 'transform 0.2s ease-in-out',
-        '&:hover': { transform: 'translateY(-2px)' }
-      }}>
-        <CardContent sx={{ p: 3 }}>
+    <Box>
+      <Card>
+        <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
-              Job Types Management
+              Job types management
             </Typography>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleAddNew}
-              sx={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                }
-              }}
             >
-              Add New Job Type
+              Add new job type
             </Button>
           </Box>
-          
+
           <Box sx={{ height: "calc(100vh - 300px)", width: "100%" }}>
             <DataGrid
               rows={rows}
@@ -273,29 +258,11 @@ export default function JobTypes() {
                 },
               }}
               sx={{
-                border: "none",
-                "& .MuiDataGrid-cell": {
-                  borderBottom: "1px solid #e2e8f0",
+                '& .MuiDataGrid-row.Mui-selected': {
+                  backgroundColor: 'var(--xz-teal-50)',
                 },
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                  color: "#374151",
-                  fontWeight: 600,
-                },
-                "& .MuiDataGrid-row:hover": {
-                  backgroundColor: "#f1f5f9",
-                },
-                "& .MuiDataGrid-row.Mui-selected": {
-                  backgroundColor: "#dbeafe",
-                },
-                "& .MuiDataGrid-row.Mui-selected:hover": {
-                  backgroundColor: "#bfdbfe",
-                },
-                "& .MuiDataGrid-toolbarContainer": {
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "1px solid #e2e8f0",
-                  padding: "8px 16px",
+                '& .MuiDataGrid-row.Mui-selected:hover': {
+                  backgroundColor: 'var(--xz-teal-50)',
                 },
               }}
             />
@@ -308,7 +275,7 @@ export default function JobTypes() {
         <DialogTitle>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6">
-              {editingJobType?._id ? 'Edit Job Type' : 'Add New Job Type'}
+              {editingJobType?._id ? 'Edit job type' : 'Add new job type'}
             </Typography>
             <IconButton onClick={() => setEditDialogOpen(false)}>
               <CloseIcon />
@@ -349,19 +316,12 @@ export default function JobTypes() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={handleSave} 
+          <Button
+            onClick={handleSave}
             variant="contained"
             disabled={isSaving || !editingJobType?.name}
-            sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-              }
-            }}
           >
-            {isSaving ? <><CircularProgress size={18} sx={{ mr: 1, color: 'white' }} /> Saving...</> : 'Save'}
+            {isSaving ? <><CircularProgress size={18} sx={{ mr: 1, color: 'inherit' }} /> Saving…</> : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>
