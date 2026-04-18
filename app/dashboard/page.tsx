@@ -36,31 +36,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
-
-// Chart chrome + series palette tokens. Hex values mirror the
-// --xz-* tokens defined in app/local.css (chart skill palette)
-// and the standard's status family. SVG attributes don't resolve
-// CSS var() so we pass hex literals; the single source of truth
-// is local.css — update both together if the palette shifts.
-const CHART_GRID = "#E2E8F0";       // --xz-hairline
-const CHART_AXIS_TEXT = "#64748B";  // --xz-ink-500
-const CHART_PALETTE = {
-  demand:   "#F87171",  // --xz-coral-500
-  capacity: "#19B1A1",  // --xz-teal
-  cnc:      "#3B82F6",  // --xz-chart-skill-a
-  build:    "#8B5CF6",  // --xz-chart-skill-b
-  paint:    "#EC4899",  // --xz-chart-skill-c
-  av:       "#F59E0B",  // --xz-chart-skill-d
-  packLoad: "#14B8A6",  // --xz-chart-skill-e
-} as const;
-const CHART_TOOLTIP_STYLE = {
-  backgroundColor: "var(--xz-surface)",
-  border: "1px solid var(--xz-hairline)",
-  borderRadius: "var(--xz-r-md)",
-  boxShadow: "var(--xz-shadow-md)",
-  fontSize: 13,
-  color: "var(--xz-ink-700)",
-} as const;
+import {
+  CHART_GRID,
+  CHART_AXIS_TEXT,
+  CHART_TOOLTIP_STYLE,
+  CHART_TOOLTIP_LABEL_STYLE,
+  CHART_LEGEND_STYLE,
+  CHART_PALETTE,
+} from "@/lib/chartTokens";
 
 // Thresholds mirror the pressure-table traffic-light semantics:
 // >100% over-capacity (coral), >80% at-risk (amber), otherwise
@@ -658,12 +641,10 @@ export default function Dashboard() {
                 />
                 <Tooltip
                   contentStyle={CHART_TOOLTIP_STYLE}
-                  labelStyle={{ color: "var(--xz-ink)", fontWeight: 600 }}
+                  labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                   cursor={{ stroke: CHART_GRID }}
                 />
-                <Legend
-                  wrapperStyle={{ color: "var(--xz-ink-700)", fontSize: 12 }}
-                />
+                <Legend wrapperStyle={CHART_LEGEND_STYLE} />
 
                 {/* Total lines */}
                 <Line

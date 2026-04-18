@@ -6,7 +6,6 @@ import {
   Alert,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -32,6 +31,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import {
+  CHART_GRID,
+  CHART_AXIS_TEXT,
+  CHART_TOOLTIP_STYLE,
+  CHART_TOOLTIP_LABEL_STYLE,
+  CHART_BRAND_STROKE,
+} from '@/lib/chartTokens';
 
 type CurveStatus = 'Draft' | 'Active' | 'Archived';
 type StatusFilter = 'All' | CurveStatus;
@@ -64,12 +70,6 @@ interface CurvesResponse {
   counts: Record<string, number>;
   total: number;
 }
-
-const STATUS_COLOR: Record<string, 'warning' | 'success' | 'default'> = {
-  Draft: 'warning',
-  Active: 'success',
-  Archived: 'default',
-};
 
 // Curve status → standard .pill variant. Mapping per audit §7:
 //   Draft    → pill--sky   (pencilled / not yet live)
@@ -299,11 +299,9 @@ function CurveDetailDialog({
           <Typography variant="h6" component="span">
             {curve.jobType} · {curve.taskType}
           </Typography>
-          <Chip
-            label={curve.curveStatus}
-            size="small"
-            color={STATUS_COLOR[curve.curveStatus] ?? 'default'}
-          />
+          <span className={statusPillClass(curve.curveStatus)}>
+            {curve.curveStatus}
+          </span>
         </Stack>
         <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 0.5 }}>
           {curve.curveId} · {curve.version}
@@ -313,14 +311,42 @@ function CurveDetailDialog({
         <Box sx={{ height: 280, mt: 1, mb: 2 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
               <XAxis
                 dataKey="progress"
-                label={{ value: 'Project progress %', position: 'insideBottom', offset: -8 }}
+                stroke={CHART_AXIS_TEXT}
+                tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
+                label={{
+                  value: 'Project progress %',
+                  position: 'insideBottom',
+                  offset: -8,
+                  fill: CHART_AXIS_TEXT,
+                  fontSize: 12,
+                }}
               />
-              <YAxis label={{ value: 'Intensity', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="intensity" stroke="#764ba2" strokeWidth={3} dot={false} />
+              <YAxis
+                stroke={CHART_AXIS_TEXT}
+                tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
+                label={{
+                  value: 'Intensity',
+                  angle: -90,
+                  position: 'insideLeft',
+                  fill: CHART_AXIS_TEXT,
+                  fontSize: 12,
+                }}
+              />
+              <Tooltip
+                contentStyle={CHART_TOOLTIP_STYLE}
+                labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                cursor={{ stroke: CHART_GRID }}
+              />
+              <Line
+                type="monotone"
+                dataKey="intensity"
+                stroke={CHART_BRAND_STROKE}
+                strokeWidth={3}
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </Box>
@@ -352,13 +378,21 @@ function CurveDetailDialog({
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
         {curve.curveStatus !== 'Archived' && (
-          <Button onClick={() => onStatusChange('Archived')} disabled={busy} color="inherit">
+          <Button
+            onClick={() => onStatusChange('Archived')}
+            disabled={busy}
+            variant="outlined"
+          >
             Archive
           </Button>
         )}
         {curve.curveStatus !== 'Draft' && (
-          <Button onClick={() => onStatusChange('Draft')} disabled={busy}>
-            Mark Draft
+          <Button
+            onClick={() => onStatusChange('Draft')}
+            disabled={busy}
+            variant="outlined"
+          >
+            Mark draft
           </Button>
         )}
         {curve.curveStatus !== 'Active' && (
@@ -366,7 +400,7 @@ function CurveDetailDialog({
             onClick={() => onStatusChange('Active')}
             disabled={busy}
             variant="contained"
-            color="success"
+            color="primary"
           >
             Activate
           </Button>
