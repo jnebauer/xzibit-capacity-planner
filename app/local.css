@@ -80,6 +80,17 @@
   --xz-chart-skill-c: #EC4899;  /* Paint      — pink       */
   --xz-chart-skill-d: #F59E0B;  /* AV         — amber-500  */
   --xz-chart-skill-e: #14B8A6;  /* Pack&Load  — teal-500   */
+
+  /* Algorithm-reference curves rendered alongside the skill
+     series on /curves-explainer (Linear / Triangular / Bell).
+     These are illustrative overlays, not primary data, so
+     they render as dashed lines in muted variants of the
+     skill palette.
+     TODO v1.1: bundle with "chart palette A" above so apps
+     with theoretical-overlay charts share one canonical set. */
+  --xz-chart-algo-a: #64748B;   /* Linear      — ink-500   */
+  --xz-chart-algo-b: #8B5CF6;   /* Triangular  — violet    */
+  --xz-chart-algo-c: #0F8E80;   /* Bell        — teal-600  */
 }
 
 /* =========================================================

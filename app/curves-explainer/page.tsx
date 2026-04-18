@@ -4,6 +4,23 @@ import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Box, Card, CardContent, Typography, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress, Alert } from '@mui/material';
+import {
+  CHART_GRID,
+  CHART_AXIS_TEXT,
+  CHART_TOOLTIP_STYLE,
+  CHART_TOOLTIP_LABEL_STYLE,
+  CHART_LEGEND_STYLE,
+  CHART_PALETTE,
+  CHART_ALGO_PALETTE,
+} from '@/lib/chartTokens';
+
+const SKILL_STROKE: Record<string, string> = {
+  CNC: CHART_PALETTE.cnc,
+  Build: CHART_PALETTE.build,
+  Paint: CHART_PALETTE.paint,
+  AV: CHART_PALETTE.av,
+  'Pack & Load': CHART_PALETTE.packLoad,
+};
 
 // Utility functions for curve calculations
 function rampUpWeights(N: number): number[] { 
@@ -211,96 +228,69 @@ export default function CurvesExplainer() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Card sx={{ 
-        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        borderRadius: 3,
-        transition: 'transform 0.2s ease-in-out',
-        '&:hover': { transform: 'translateY(-2px)' }
-      }}>
-        <CardContent sx={{ p: 3 }}>
+    <Box>
+      <Card>
+        <CardContent>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-            Workload Distribution Curves by Job Type
+            Workload distribution curves by job type
           </Typography>
-          
+
           <Box sx={{ display: 'grid', gap: 3 }}>
             {/* Job Type Selection Controls */}
             <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'end' }}>
               <FormControl sx={{ minWidth: 250 }}>
-                <InputLabel>Job Type</InputLabel>
+                <InputLabel>Job type</InputLabel>
                 <Select
                   value={selectedJobType}
                   onChange={(e) => setSelectedJobType(e.target.value)}
-                  label="Job Type"
-                  sx={{
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#e2e8f0',
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#cbd5e1',
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#667eea',
-                    },
-                  }}
+                  label="Job type"
                 >
                   {jobTypes.map((type: string) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
-              
+
               <TextField
-                label="Build Weeks"
+                label="Build weeks"
                 type="number"
                 value={weeks}
                 inputProps={{ min: 1, max: 52 }}
                 onChange={(e) => setWeeks(Math.max(1, Math.min(52, Math.floor(Number(e.target.value) || 1))))}
-                sx={{ 
-                  width: 150,
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#e2e8f0',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#cbd5e1',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#667eea',
-                  },
-                }}
+                sx={{ width: 150 }}
               />
             </Box>
 
             {/* Job Type Statistics */}
             {jobTypeStats && (
               <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-                <Card sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                  <Typography variant="body2" color="text.secondary">Total Hours</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="body2" color="text.secondary">Total hours</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--xz-teal)' }}>
                     {jobTypeStats.totalHours.toFixed(1)}h
                   </Typography>
                 </Card>
-                <Card sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                  <Typography variant="body2" color="text.secondary">Build Weeks</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="body2" color="text.secondary">Build weeks</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--xz-teal)' }}>
                     {jobTypeStats.weeksToBuild} weeks
                   </Typography>
                 </Card>
-                <Card sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                  <Typography variant="body2" color="text.secondary">Onsite Weeks</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="body2" color="text.secondary">Onsite weeks</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--xz-teal)' }}>
                     {jobTypeStats.onsiteWeeks.toFixed(1)} weeks
                   </Typography>
                 </Card>
-                <Card sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                  <Typography variant="body2" color="text.secondary">Curve Mode</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="body2" color="text.secondary">Curve mode</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--xz-teal)' }}>
                     {jobTypeStats.curveMode}
                   </Typography>
                 </Card>
-                <Card sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                <Card variant="outlined" sx={{ p: 2 }}>
                   <Typography variant="body2" color="text.secondary">Projects</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--xz-teal)' }}>
                     {jobTypeStats.projectCount}
                   </Typography>
                 </Card>
@@ -309,148 +299,124 @@ export default function CurvesExplainer() {
 
             {/* Skill Breakdown */}
             {jobTypeStats && (
-              <Card sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#667eea' }}>
-                  Skill Breakdown for {selectedJobType}
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                  Skill breakdown for {selectedJobType}
                 </Typography>
                 <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">CNC</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#ff6b6b' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: CHART_PALETTE.cnc }}>
                       {jobTypeStats.skillTotals.cnc.toFixed(1)}h
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">Build</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#4ecdc4' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: CHART_PALETTE.build }}>
                       {jobTypeStats.skillTotals.build.toFixed(1)}h
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">Paint</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#45b7d1' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: CHART_PALETTE.paint }}>
                       {jobTypeStats.skillTotals.paint.toFixed(1)}h
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">AV</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#96ceb4' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: CHART_PALETTE.av }}>
                       {jobTypeStats.skillTotals.av.toFixed(1)}h
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">Pack & Load</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#feca57' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: CHART_PALETTE.packLoad }}>
                       {jobTypeStats.skillTotals.packAndLoad.toFixed(1)}h
                     </Typography>
                   </Box>
                 </Box>
               </Card>
             )}
-            
+
             {/* Chart */}
             <Box sx={{ height: 500, width: '100%' }}>
               <ResponsiveContainer>
                 <LineChart data={datasets}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey="label" 
-                    stroke="#666"
-                    tick={{ fontSize: 12, fill: '#666' }}
+                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+                  <XAxis
+                    dataKey="label"
+                    stroke={CHART_AXIS_TEXT}
+                    tick={{ fontSize: 12, fill: CHART_AXIS_TEXT }}
                   />
-                  <YAxis 
-                    stroke="#666"
-                    tick={{ fontSize: 12, fill: '#666' }}
+                  <YAxis
+                    stroke={CHART_AXIS_TEXT}
+                    tick={{ fontSize: 12, fill: CHART_AXIS_TEXT }}
                   />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'white', 
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 8,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                    }}
+                  <Tooltip
+                    contentStyle={CHART_TOOLTIP_STYLE}
+                    labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                    cursor={{ stroke: CHART_GRID }}
                   />
-                  <Legend 
-                    wrapperStyle={{
-                      paddingTop: '20px',
-                      fontSize: '12px'
-                    }}
-                  />
-                  
+                  <Legend wrapperStyle={{ ...CHART_LEGEND_STYLE, paddingTop: '20px' }} />
+
                   {/* Skill-specific curves */}
-                  {skills.map((skill, index) => (
-                    <Line 
-                      key={skill} 
-                      type="monotone" 
-                      dataKey={skill} 
+                  {skills.map((skill) => (
+                    <Line
+                      key={skill}
+                      type="monotone"
+                      dataKey={skill}
                       name={`${skill} (${curveLibraryData?.curves ? 'Library' : 'Bell Curve'})`}
-                      dot={false} 
+                      dot={false}
                       strokeWidth={3}
-                      stroke={[
-                        '#ff6b6b', // CNC - Red
-                        '#4ecdc4', // Build - Teal
-                        '#45b7d1', // Paint - Blue
-                        '#96ceb4', // AV - Green
-                        '#feca57'  // Pack & Load - Yellow
-                      ][index]}
-                      activeDot={{ 
-                        r: 6, 
-                        stroke: [
-                          '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'
-                        ][index], 
-                        strokeWidth: 2 
-                      }}
+                      stroke={SKILL_STROKE[skill]}
+                      activeDot={{ r: 6, stroke: SKILL_STROKE[skill], strokeWidth: 2 }}
                     />
                   ))}
-                  
+
                   {/* Theoretical curves */}
-                  <Line 
-                    type="monotone" 
-                    dataKey="Linear" 
-                    name="Linear (Uniform)"
-                    dot={false} 
+                  <Line
+                    type="monotone"
+                    dataKey="Linear"
+                    name="Linear (uniform)"
+                    dot={false}
                     strokeWidth={2}
-                    stroke="#feca57"
+                    stroke={CHART_ALGO_PALETTE.linear}
                     strokeDasharray="5 5"
-                    activeDot={{ r: 6, stroke: '#feca57', strokeWidth: 2 }}
+                    activeDot={{ r: 6, stroke: CHART_ALGO_PALETTE.linear, strokeWidth: 2 }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="Triangular" 
-                    name="Triangular (Peak at End)"
-                    dot={false} 
+                  <Line
+                    type="monotone"
+                    dataKey="Triangular"
+                    name="Triangular (peak at end)"
+                    dot={false}
                     strokeWidth={2}
-                    stroke="#6c5ce7"
+                    stroke={CHART_ALGO_PALETTE.triangular}
                     strokeDasharray="10 5"
-                    activeDot={{ r: 6, stroke: '#6c5ce7', strokeWidth: 2 }}
+                    activeDot={{ r: 6, stroke: CHART_ALGO_PALETTE.triangular, strokeWidth: 2 }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="Bell Curve" 
-                    name="Bell Curve (Peak in Middle)"
-                    dot={false} 
+                  <Line
+                    type="monotone"
+                    dataKey="Bell Curve"
+                    name="Bell curve (peak in middle)"
+                    dot={false}
                     strokeWidth={2}
-                    stroke="#00b894"
+                    stroke={CHART_ALGO_PALETTE.bell}
                     strokeDasharray="15 5"
-                    activeDot={{ r: 6, stroke: '#00b894', strokeWidth: 2 }}
+                    activeDot={{ r: 6, stroke: CHART_ALGO_PALETTE.bell, strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </Box>
-            
+
             {/* Information Card */}
-            <Card sx={{ 
-              backgroundColor: '#f8f9fa',
-              border: '1px solid #e9ecef',
-              borderRadius: 2
-            }}>
+            <Card variant="outlined">
               <CardContent sx={{ p: 2 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: 13, lineHeight: 1.5 }}>
-                  <strong>Workload Distribution Curves</strong> show how project hours are distributed across the build timeline for different job types and skills. 
-                  <strong>Library curves</strong> are pulled from your curve library data when available. 
-                  <strong>Bell Curve</strong> represents a normal distribution with peak workload in the middle. 
-                  <strong>Triangular</strong> shows increasing workload towards the end (truck date). 
-                  <strong>Linear</strong> represents uniform distribution across all weeks.
+                  <strong>Workload distribution curves</strong> show how project hours are distributed across the build timeline for different job types and skills.
+                  <strong> Library curves</strong> are pulled from your curve library data when available.
+                  <strong> Bell curve</strong> represents a normal distribution with peak workload in the middle.
+                  <strong> Triangular</strong> shows increasing workload towards the end (truck date).
+                  <strong> Linear</strong> represents uniform distribution across all weeks.
                 </Typography>
               </CardContent>
             </Card>

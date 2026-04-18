@@ -50,3 +50,12 @@ export const CHART_PALETTE = {
 // intensity-shape chart. Teal, since the line is a representation
 // of the brand-accent curve itself.
 export const CHART_BRAND_STROKE = "#19B1A1"; // --xz-teal
+
+// Algorithm-reference curves overlaid on the skill chart in
+// /curves-explainer. Rendered as dashed lines. Mirrors the
+// --xz-chart-algo-{a,b,c} CSS vars in app/local.css.
+export const CHART_ALGO_PALETTE = {
+  linear:     "#64748B", // --xz-chart-algo-a (ink-500)
+  triangular: "#8B5CF6", // --xz-chart-algo-b (violet)
+  bell:       "#0F8E80", // --xz-chart-algo-c (teal-600)
+} as const;
