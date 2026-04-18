@@ -36,6 +36,24 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
+import {
+  CHART_GRID,
+  CHART_AXIS_TEXT,
+  CHART_TOOLTIP_STYLE,
+  CHART_TOOLTIP_LABEL_STYLE,
+  CHART_LEGEND_STYLE,
+  CHART_PALETTE,
+} from "@/lib/chartTokens";
+
+// Thresholds mirror the pressure-table traffic-light semantics:
+// >100% over-capacity (coral), >80% at-risk (amber), otherwise
+// on-track (mint). Same breakpoints the old inline-coloured cells
+// used — only the presentation changes.
+function utilisationPillClass(utilisation: number): string {
+  if (utilisation > 100) return 'pill pill--coral';
+  if (utilisation > 80) return 'pill pill--amber';
+  return 'pill pill--mint';
+}
 
 // PROPER LOGIC: Realistic workload distribution
 function processProjectForDashboard(project: any) {
@@ -462,41 +480,39 @@ export default function Dashboard() {
   }
 
   return (
-    <Box sx={{ p: 3, display: "grid", gap: 3 }}>
-      {/* Control Panel */}
-      <Card sx={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        color: "white",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-        borderRadius: 3,
-      }}>
-        <CardContent sx={{ p: 2 }}>
-          <Box sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 1.5,
-            mt: 1,
-            p: 1.5,
-            backgroundColor: "rgba(255,255,255,0.08)",
-            borderRadius: 2,
-            border: "1px solid rgba(255,255,255,0.15)",
-            backdropFilter: "blur(10px)",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "center"
-          }}>
-            {/* Probability Slider */}
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              gap: 0.5, 
-              p: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: 1,
-              border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "140px"
-            }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, textAlign: "center", fontSize: "0.7rem" }}>
+    <Box sx={{ display: "grid", gap: 3 }}>
+      {/* Stat row */}
+      <div className="stat-row">
+        <div className="stat mint">
+          <span className="stripe" />
+          <div className="label">Total projects</div>
+          <div className="value">{filteredProjects.length}</div>
+        </div>
+        <div className="stat sky">
+          <span className="stripe" />
+          <div className="label">Total staff</div>
+          <div className="value">{staffCount}</div>
+        </div>
+        <div className="stat lilac">
+          <span className="stripe" />
+          <div className="label">Weeks in range</div>
+          <div className="value">{weeks.length}</div>
+        </div>
+        <div className="stat amber">
+          <span className="stripe" />
+          <div className="label">Current week</div>
+          <div className="value">
+            {weeks.find((w: any) => w.isCurrentWeek)?.weekLabel || '—'}
+          </div>
+        </div>
+      </div>
+
+      {/* Filter card */}
+      <Card>
+        <CardContent>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, alignItems: "flex-start" }}>
+            <Box sx={{ minWidth: 220, flex: "1 1 220px" }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 Probability ≥ {probability}%
               </Typography>
               <Slider
@@ -508,66 +524,39 @@ export default function Dashboard() {
                 marks
                 valueLabelDisplay="auto"
                 size="small"
-                sx={{
-                  "& .MuiSlider-track": { backgroundColor: "rgba(255,255,255,0.9)", height: 2 },
-                  "& .MuiSlider-thumb": { backgroundColor: "white", width: 14, height: 14 },
-                  "& .MuiSlider-mark": { backgroundColor: "rgba(255,255,255,0.6)" },
-                }}
               />
             </Box>
 
-            {/* Skill Visibility */}
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              alignItems: "center",
-              p: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: 1,
-              border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "120px"
-            }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 0.5, fontSize: "0.7rem" }}>
-                Skill Lines
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Skill lines
               </Typography>
-              <Box sx={{ display: "flex", gap: 0.3, flexWrap: "wrap", justifyContent: "center" }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 1, rowGap: 0 }}>
                 {Object.entries(skillVisibility).map(([skill, visible]) => (
                   <FormControlLabel
                     key={skill}
                     control={
                       <Checkbox
                         checked={visible}
-                        onChange={(e) => setSkillVisibility(prev => ({ ...prev, [skill]: e.target.checked }))}
+                        onChange={(e) =>
+                          setSkillVisibility(prev => ({ ...prev, [skill]: e.target.checked }))
+                        }
                         size="small"
-                        sx={{ color: "rgba(255,255,255,0.8)", "&.Mui-checked": { color: "white" } }}
                       />
                     }
                     label={
-                      <Typography variant="caption" sx={{ color: "white", fontWeight: 500, fontSize: "0.55rem" }}>
+                      <Typography variant="body2">
                         {skill === "Pack & Load" ? "P&L" : skill}
                       </Typography>
                     }
-                    sx={{ margin: 0, minWidth: "auto" }}
                   />
                 ))}
               </Box>
             </Box>
 
-            {/* Include Site Install */}
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              alignItems: "center",
-              p: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: 1,
-              border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "100px"
-            }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 0.5, fontSize: "0.7rem" }}>
-                Site Install
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Site install
               </Typography>
               <FormControlLabel
                 control={
@@ -575,344 +564,162 @@ export default function Dashboard() {
                     checked={includeOnsite}
                     onChange={(e) => setIncludeOnsite(e.target.checked)}
                     size="small"
-                    sx={{ color: "rgba(255,255,255,0.8)", "&.Mui-checked": { color: "white" } }}
                   />
                 }
-                label={
-                  <Typography variant="caption" sx={{ color: "white", fontWeight: 500, fontSize: "0.55rem" }}>
-                    Include Onsite
-                  </Typography>
-                }
-                sx={{ margin: 0, minWidth: "auto" }}
+                label={<Typography variant="body2">Include onsite</Typography>}
               />
             </Box>
 
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              alignItems: "center",
-              p: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: 1,
-              border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "160px"
-            }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 0.5, textAlign: "center", fontSize: "0.7rem" }}>
-                Demand Engine
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Quick range
               </Typography>
-              <Typography variant="caption" sx={{ color: "white", textAlign: "center", fontSize: "0.6rem", lineHeight: 1.4 }}>
-                Whiplash curve-based planning active
-              </Typography>
+              <ToggleButtonGroup
+                value={dateRangeFilter}
+                exclusive
+                onChange={(_, value) => value && setDateRangeFilter(value)}
+                size="small"
+              >
+                <ToggleButton value="next">Next 12M</ToggleButton>
+                <ToggleButton value="previous">Previous 12M</ToggleButton>
+              </ToggleButtonGroup>
             </Box>
 
-            {/* Quick Date Range */}
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              alignItems: "center",
-              p: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: 1,
-              border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "140px"
-            }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 0.5, fontSize: "0.7rem" }}>
-                Quick Date Range
-              </Typography>
-              <Box sx={{ display: "flex", gap: 0.3, justifyContent: "center" }}>
-                <Button
-                  size="small"
-                  variant={dateRangeFilter === 'next' ? "contained" : "outlined"}
-                  onClick={() => setDateRangeFilter('next')}
-                  sx={{
-                    color: dateRangeFilter === 'next' ? "white" : "rgba(255,255,255,0.9)",
-                    backgroundColor: dateRangeFilter === 'next' ? "rgba(255,255,255,0.2)" : "transparent",
-                    borderColor: "rgba(255,255,255,0.3)",
-                    fontSize: "0.55rem",
-                    py: 0.3,
-                    px: 0.6,
-                    minWidth: "60px",
-                    "&:hover": {
-                      borderColor: "white",
-                      backgroundColor: dateRangeFilter === 'next' ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)",
-                    }
-                  }}
-                >
-                  Next 12M
-                </Button>
-                <Button
-                  size="small"
-                  variant={dateRangeFilter === 'previous' ? "contained" : "outlined"}
-                  onClick={() => setDateRangeFilter('previous')}
-                  sx={{
-                    color: dateRangeFilter === 'previous' ? "white" : "rgba(255,255,255,0.9)",
-                    backgroundColor: dateRangeFilter === 'previous' ? "rgba(255,255,255,0.2)" : "transparent",
-                    borderColor: "rgba(255,255,255,0.3)",
-                    fontSize: "0.55rem",
-                    py: 0.3,
-                    px: 0.6,
-                    minWidth: "60px",
-                    "&:hover": {
-                      borderColor: "white",
-                      backgroundColor: dateRangeFilter === 'previous' ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)",
-                    }
-                  }}
-                >
-                  Previous 12M
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Custom Date Range */}
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              gap: 0.5, 
-              p: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: 1,
-              border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "160px"
-            }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, textAlign: "center", fontSize: "0.7rem" }}>
-                Custom Date Range
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Custom range
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box sx={{ display: "flex", flexDirection: "row", gap: 0.5 }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
                   <DatePicker
                     value={startDate}
                     onChange={(v) => v && setStartDate(v)}
                     format="DD/MM/YYYY"
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        placeholder: "Start",
-                        sx: {
-                          "& .MuiInputBase-root": { 
-                            color: "white", 
-                            backgroundColor: "rgba(255,255,255,0.1)",
-                            border: "1px solid rgba(255,255,255,0.3)",
-                            borderRadius: 1,
-                            "&:hover": {
-                              borderColor: "rgba(255,255,255,0.5)",
-                            },
-                            "&:focus-within": {
-                              borderColor: "white",
-                            }
-                          },
-                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                          "& .MuiInputBase-input": {
-                            fontSize: "10px",
-                            padding: "4px 8px",
-                            "&::placeholder": {
-                              color: "rgba(255,255,255,0.6)",
-                              opacity: 1
-                            }
-                          },
-                          "& .MuiInputLabel-root": {
-                            color: "rgba(255,255,255,0.7)",
-                            fontSize: "10px"
-                          }
-                        },
-                      },
-                    }}
+                    slotProps={{ textField: { size: "small", placeholder: "Start" } }}
                   />
                   <DatePicker
                     value={endDate}
                     onChange={(v) => v && setEndDate(v)}
                     format="DD/MM/YYYY"
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        placeholder: "End",
-                        sx: {
-                          "& .MuiInputBase-root": { 
-                            color: "white", 
-                            backgroundColor: "rgba(255,255,255,0.1)",
-                            border: "1px solid rgba(255,255,255,0.3)",
-                            borderRadius: 1,
-                            "&:hover": {
-                              borderColor: "rgba(255,255,255,0.5)",
-                            },
-                            "&:focus-within": {
-                              borderColor: "white",
-                            }
-                          },
-                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                          "& .MuiInputBase-input": {
-                            fontSize: "10px",
-                            padding: "4px 8px",
-                            "&::placeholder": {
-                              color: "rgba(255,255,255,0.6)",
-                              opacity: 1
-                            }
-                          },
-                          "& .MuiInputLabel-root": {
-                            color: "rgba(255,255,255,0.7)",
-                            fontSize: "10px"
-                          }
-                        },
-                      },
-                    }}
+                    slotProps={{ textField: { size: "small", placeholder: "End" } }}
                   />
                 </Box>
               </LocalizationProvider>
-            </Box>
-
-            {/* Summary */}
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              alignItems: "center",
-              p: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: 1,
-              border: "1px solid rgba(255,255,255,0.1)",
-              minWidth: "140px"
-            }}>
-              <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, mb: 0.5, fontSize: "0.7rem" }}>
-                Summary
-              </Typography>
-              <Box sx={{ display: "flex", gap: 0.8, alignItems: "center" }}>
-                <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="h6" sx={{ color: "white", fontWeight: 600, mb: 0, fontSize: "0.9rem" }}>
-                    {filteredProjects.length}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.5rem" }}>
-                    Projects
-                  </Typography>
-                </Box>
-                <Box sx={{ width: "1px", height: "14px", backgroundColor: "rgba(255,255,255,0.2)" }} />
-                <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="h6" sx={{ color: "white", fontWeight: 600, mb: 0, fontSize: "0.9rem" }}>
-                    {staffCount}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.5rem" }}>
-                    Staff
-                  </Typography>
-                </Box>
-                <Box sx={{ width: "1px", height: "14px", backgroundColor: "rgba(255,255,255,0.2)" }} />
-                <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="h6" sx={{ color: "white", fontWeight: 600, mb: 0, fontSize: "0.9rem" }}>
-                    {weeks.length}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.5rem" }}>
-                    Weeks
-                  </Typography>
-                </Box>
-              </Box>
             </Box>
           </Box>
         </CardContent>
       </Card>
 
       {/* Chart */}
-      <Card sx={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)", borderRadius: 3 }}>
-        <CardContent sx={{ p: 3 }}>
-                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-             {dateRangeFilter === 'next' ? 'NEXT 12 MONTHS' : 'PREVIOUS 12 MONTHS'} - Capacity vs Demand Overview
-           </Typography>
-          
+      <Card>
+        <CardContent>
+          <div className="card-head">
+            <div>
+              <div className="card-title">Capacity vs demand</div>
+              <div className="card-sub">
+                {dateRangeFilter === 'next' ? 'Next 12 months' : 'Previous 12 months'}
+              </div>
+            </div>
+          </div>
+
           <Box sx={{ height: 500, width: "100%" }}>
             <ResponsiveContainer>
               <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="weekLabel" 
-                  stroke="#666"
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+                <XAxis
+                  dataKey="weekLabel"
+                  stroke={CHART_AXIS_TEXT}
+                  tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
                   tickFormatter={(value, index) => {
                     const week = weeks[index];
                     return week?.isCurrentWeek ? `🔥 ${value}` : value;
                   }}
                 />
-                <YAxis stroke="#666" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: 8,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  }}
+                <YAxis
+                  stroke={CHART_AXIS_TEXT}
+                  tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
                 />
-                <Legend />
-                
+                <Tooltip
+                  contentStyle={CHART_TOOLTIP_STYLE}
+                  labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                  cursor={{ stroke: CHART_GRID }}
+                />
+                <Legend wrapperStyle={CHART_LEGEND_STYLE} />
+
                 {/* Total lines */}
                 <Line
                   type={curveMode === 'adrian' ? "monotone" : "linear"}
                   dataKey="totalDemand"
-                  name="Total Demand (h)"
+                  name="Total demand (h)"
                   strokeWidth={3}
-                  stroke="#ff6b6b"
+                  stroke={CHART_PALETTE.demand}
                   dot={false}
-                  activeDot={{ r: 6, stroke: "#ff6b6b", strokeWidth: 2 }}
+                  activeDot={{ r: 6, stroke: CHART_PALETTE.demand, strokeWidth: 2 }}
                 />
                 <Line
                   type={curveMode === 'adrian' ? "monotone" : "linear"}
                   dataKey="totalCapacity"
-                  name="Total Capacity (h)"
+                  name="Total capacity (h)"
                   strokeWidth={3}
-                  stroke="#4ecdc4"
+                  stroke={CHART_PALETTE.capacity}
                   dot={false}
-                  activeDot={{ r: 6, stroke: "#4ecdc4", strokeWidth: 2 }}
+                  activeDot={{ r: 6, stroke: CHART_PALETTE.capacity, strokeWidth: 2 }}
                 />
-                
+
                 {/* Skill demand lines */}
                 {skillVisibility.CNC && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="cncDemand"
-                    name="CNC Demand"
+                    name="CNC demand"
                     strokeWidth={2}
-                    stroke="#ff9ff3"
+                    stroke={CHART_PALETTE.cnc}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#ff9ff3", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.cnc, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility.Build && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="buildDemand"
-                    name="Build Demand"
+                    name="Build demand"
                     strokeWidth={2}
-                    stroke="#54a0ff"
+                    stroke={CHART_PALETTE.build}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#54a0ff", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.build, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility.Paint && (
                   <Line
                     type={curveMode === 'linear' ? "linear" : "monotone"}
                     dataKey="paintDemand"
-                    name="Paint Demand"
+                    name="Paint demand"
                     strokeWidth={2}
-                    stroke="#ff9f43"
+                    stroke={CHART_PALETTE.paint}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#ff9f43", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.paint, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility.AV && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="avDemand"
-                    name="AV Demand"
+                    name="AV demand"
                     strokeWidth={2}
-                    stroke="#5f27cd"
+                    stroke={CHART_PALETTE.av}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#5f27cd", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.av, strokeWidth: 1 }}
                   />
                 )}
                 {skillVisibility["Pack & Load"] && (
                   <Line
                     type={curveMode === 'adrian' ? "monotone" : "linear"}
                     dataKey="packLoadDemand"
-                    name="P&L Demand"
+                    name="P&L demand"
                     strokeWidth={2}
-                    stroke="#00d2d3"
+                    stroke={CHART_PALETTE.packLoad}
                     dot={false}
-                    activeDot={{ r: 4, stroke: "#00d2d3", strokeWidth: 1 }}
+                    activeDot={{ r: 4, stroke: CHART_PALETTE.packLoad, strokeWidth: 1 }}
                   />
                 )}
               </LineChart>
@@ -921,96 +728,105 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Debug Info */}
-      <Card sx={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)", borderRadius: 3 }}>
-        <CardContent sx={{ p: 3 }}>
-                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-             DEBUG INFO - {dateRangeFilter === 'next' ? 'Next' : 'Previous'} 12 Months Logic
-           </Typography>
-          
-          <Box sx={{ display: "grid", gap: 2 }}>
-            <Typography variant="body2">
+      {/* Debug info */}
+      <Card>
+        <CardContent>
+          <div className="card-head">
+            <div>
+              <div className="h3">Debug info</div>
+              <div className="card-sub">
+                {dateRangeFilter === 'next' ? 'Next' : 'Previous'} 12 months logic
+              </div>
+            </div>
+          </div>
+          <Box sx={{ display: "grid", gap: 1 }}>
+            <div className="meta">
               <strong>Total Projects:</strong> {projects.length} | <strong>Filtered Projects (Complete Data Only):</strong> {filteredProjects.length}
-            </Typography>
-            <Typography variant="body2">
+            </div>
+            <div className="meta">
               <strong>Total Staff:</strong> {staffCount}
-            </Typography>
-            <Typography variant="body2">
+            </div>
+            <div className="meta">
               <strong>Weeks Generated:</strong> {weeks.length}
-            </Typography>
-            <Typography variant="body2">
+            </div>
+            <div className="meta">
               <strong>First Week Demand:</strong> {weeks.length > 0 ? (demand.total[weeks[0].weekStart] || 0) : 0} hours
-            </Typography>
-            <Typography variant="body2">
+            </div>
+            <div className="meta">
               <strong>First Week Capacity:</strong> {weeks.length > 0 ? (capacity.total[weeks[0].weekStart] || 0) : 0} hours
-            </Typography>
-            <Typography variant="body2">
+            </div>
+            <div className="meta">
               <strong>Current Week:</strong> {weeks.find((w: any) => w.isCurrentWeek)?.weekLabel || 'Not in range'}
-            </Typography>
-                         <Typography variant="body2">
-               <strong>Timeline:</strong> {startDate.format('DD/MM/YYYY')} to {endDate.format('DD/MM/YYYY')}
-             </Typography>
-             <Typography variant="body2">
-               <strong>Demand Engine:</strong> Whiplash curve-based distribution
-             </Typography>
-             <Typography variant="body2">
-               <strong>Projects Excluded (Incomplete Data):</strong> {projects.length - completeProjects.length}
-             </Typography>
-             <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
-               Note: Only projects with complete data (truck load date, weeks to build, and skill hours) are included in the planning engine
-             </Typography>
-              <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
-                Note: Capacity line now applies utilisation, date-range leave, contractor bookings, and company closures where data exists
-              </Typography>
-
+            </div>
+            <div className="meta">
+              <strong>Timeline:</strong> {startDate.format('DD/MM/YYYY')} to {endDate.format('DD/MM/YYYY')}
+            </div>
+            <div className="meta">
+              <strong>Demand Engine:</strong> Whiplash curve-based distribution
+            </div>
+            <div className="meta">
+              <strong>Projects Excluded (Incomplete Data):</strong> {projects.length - completeProjects.length}
+            </div>
+            <div className="meta" style={{ fontStyle: 'italic' }}>
+              Note: Only projects with complete data (truck load date, weeks to build, and skill hours) are included in the planning engine
+            </div>
+            <div className="meta" style={{ fontStyle: 'italic' }}>
+              Note: Capacity line now applies utilisation, date-range leave, contractor bookings, and company closures where data exists
+            </div>
           </Box>
         </CardContent>
       </Card>
 
-      {/* Pressure Weeks Table */}
-      <Card sx={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)", borderRadius: 3 }}>
-        <CardContent sx={{ p: 3 }}>
-                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-             Top Pressure Weeks ({dateRangeFilter === 'next' ? 'Next' : 'Previous'} 12 Months)
-           </Typography>
-          
-          <Table sx={{
-            "& .MuiTableCell-root": { borderBottom: "1px solid #f0f0f0", padding: "12px 16px" },
-            "& .MuiTableHead-root .MuiTableCell-root": { backgroundColor: "#f8f9fa", fontWeight: 600, color: "#495057" },
-          }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Week</TableCell>
-                <TableCell>Demand (h)</TableCell>
-                <TableCell>Capacity (h)</TableCell>
-                <TableCell>Utilization</TableCell>
-                <TableCell>Gap (h)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {pressureWeeks.map((week: any, idx: number) => (
-                <TableRow key={idx} sx={{ "&:hover": { backgroundColor: "#f8f9fa" } }}>
-                  <TableCell sx={{ fontWeight: 500 }}>{week.weekLabel}</TableCell>
-                  <TableCell>{week.totalDemand.toFixed(1)}</TableCell>
-                  <TableCell>{week.totalCapacity.toFixed(1)}</TableCell>
-                  <TableCell sx={{
-                    color: week.utilization > 100 ? "#dc3545" : week.utilization > 80 ? "#ffc107" : "#28a745",
-                    fontWeight: 600,
-                  }}>
+      {/* Pressure weeks panel */}
+      <div className="panel">
+        <div className="group-head" style={{ cursor: 'default' }}>
+          <span className="title-text">Pressure weeks</span>
+          <span className="card-sub">Top 10 weeks by demand/capacity delta</span>
+        </div>
+        <Table
+          sx={{
+            '& .MuiTableHead-root .MuiTableCell-root': {
+              backgroundColor: 'var(--xz-surface-soft)',
+              color: 'var(--xz-ink-500)',
+              fontWeight: 600,
+              fontSize: 12,
+              borderBottom: '1px solid var(--xz-hairline)',
+            },
+            '& .MuiTableCell-root': {
+              borderBottom: '1px solid var(--xz-hairline-soft)',
+            },
+          }}
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell>Week</TableCell>
+              <TableCell>Demand (h)</TableCell>
+              <TableCell>Capacity (h)</TableCell>
+              <TableCell>Utilisation</TableCell>
+              <TableCell>Gap (h)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {pressureWeeks.map((week: any, idx: number) => (
+              <TableRow key={idx}>
+                <TableCell sx={{ fontWeight: 500 }}>{week.weekLabel}</TableCell>
+                <TableCell>{week.totalDemand.toFixed(1)}</TableCell>
+                <TableCell>{week.totalCapacity.toFixed(1)}</TableCell>
+                <TableCell>
+                  <span className={utilisationPillClass(week.utilization)}>
                     {week.utilization}%
-                  </TableCell>
-                  <TableCell sx={{
-                    color: week.gap > 0 ? "#dc3545" : "#28a745",
-                    fontWeight: 600,
-                  }}>
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className={`pill ${week.gap > 0 ? 'pill--coral' : 'pill--mint'}`}>
                     {week.gap.toFixed(1)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </Box>
   );
 }

@@ -1,0 +1,120 @@
+/* =========================================================
+   Capacity Planner — local component stylesheet
+
+   Composed from --xz-* tokens. Loaded from app/layout.tsx AFTER
+   the standards <link> so rules here win on source order.
+
+   Everything in this file is a candidate for upstreaming to the
+   Xzibit App Standard v1.1. Tag each block with a "TODO v1.1"
+   comment so we can batch them into a single standard PR later.
+
+   This file is an intentional stub in Pass 2 (theme wiring).
+   Populated in Pass 3 visual migration. Expected contents:
+
+     - .build-pill (SHA chip) — already shipped in Team Schedule
+       _local.css; align 1:1 here to avoid drift.
+     - .pill--muted — archived / historical status; not in the
+       standard's six-pastel family. Background surface-soft,
+       text ink-500.
+     - --xz-chart-skill-a through --xz-chart-skill-e — bespoke
+       5-slot chart palette for CNC / Build / Paint / AV /
+       Pack & Load demand series. Explicitly NOT reusing semantic
+       status colours for data series.
+     - --xz-chart-grid / --xz-chart-axis / --xz-chart-tooltip-bg
+       — Recharts chrome tokens (standard punts on chart chrome).
+     - .modal / .modal-head / .modal-body / .modal-actions — the
+       standard doesn't cover modals.
+     - DataGrid N-column / sticky-left variant (same need as
+       Team Schedule's .schedule-grid).
+   ========================================================= */
+
+/* =========================================================
+   Build/version pill — sits in the topbar's right edge.
+   Mirrors Team Schedule's .build-pill composition 1:1 so the
+   two apps render the same chip.
+   TODO v1.1: upstream to standard as a "version badge" —
+   small monospace SHA + separator + optional env suffix.
+   ========================================================= */
+.build-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--xz-r-pill);
+  background: var(--xz-surface);
+  border: 1px solid var(--xz-hairline);
+  color: var(--xz-ink-500);
+  font-size: 11px;
+  text-decoration: none;
+  box-shadow: var(--xz-shadow-sm);
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+.build-pill:hover {
+  background: var(--xz-surface-soft);
+  color: var(--xz-ink);
+  border-color: var(--xz-ink-300);
+}
+.build-pill-sha {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--xz-ink);
+  font-weight: 600;
+}
+.build-pill-sep  { color: var(--xz-ink-300); }
+.build-pill-time { color: var(--xz-ink-500); }
+
+/* =========================================================
+   Chart skill palette — bespoke 5-slot palette for demand
+   series that represent the 5 skills (CNC / Build / Paint /
+   AV / Pack & Load). Deliberately NOT reusing semantic status
+   colours (mint/sky/amber/coral/lilac/sun) for data series —
+   chart chrome obeys the status family, but data series
+   inside a chart container may extend beyond it.
+
+   TODO v1.1: propose as standard "chart palette A" so other
+   apps doing similar multi-series charts have a canonical
+   set to start from.
+   ========================================================= */
+:root {
+  --xz-chart-skill-a: #3B82F6;  /* CNC        — sky        */
+  --xz-chart-skill-b: #8B5CF6;  /* Build      — violet     */
+  --xz-chart-skill-c: #EC4899;  /* Paint      — pink       */
+  --xz-chart-skill-d: #F59E0B;  /* AV         — amber-500  */
+  --xz-chart-skill-e: #14B8A6;  /* Pack&Load  — teal-500   */
+
+  /* Algorithm-reference curves rendered alongside the skill
+     series on /curves-explainer (Linear / Triangular / Bell).
+     These are illustrative overlays, not primary data, so
+     they render as dashed lines in muted variants of the
+     skill palette.
+     TODO v1.1: bundle with "chart palette A" above so apps
+     with theoretical-overlay charts share one canonical set. */
+  --xz-chart-algo-a: #64748B;   /* Linear      — ink-500   */
+  --xz-chart-algo-b: #8B5CF6;   /* Triangular  — violet    */
+  --xz-chart-algo-c: #0F8E80;   /* Bell        — teal-600  */
+}
+
+/* =========================================================
+   .pill--muted — archived / historical / neutral status.
+   The standard ships six status pills (mint/sky/amber/coral/
+   lilac/sun). "Archived" does not map cleanly to any of them
+   (it is neither good, bad, at-risk, nor creative — it is
+   simply inactive), so we compose a seventh variant locally:
+   surface-soft fill, ink-500 text, hairline border.
+   TODO v1.1: upstream .pill--muted to the Xzibit App Standard.
+   ========================================================= */
+.pill--muted {
+  background: var(--xz-surface-soft);
+  color: var(--xz-ink-500);
+  border: 1px solid var(--xz-hairline);
+}
+
+/* =========================================================
+   TODO v1.1: standard should ship an official MuiToggleButton
+   → .tabs recipe. The MUI theme in lib/theme.ts composes this
+   (MuiToggleButtonGroup pill-bordered wrapper + MuiToggleButton
+   .Mui-selected → ink fill / white text) to match the
+   standard's .tabs / .tab.is-active aesthetic. Leaves two
+   parallel ways to express the same tab pattern (the
+   standard's .tabs + .tab.is-active classes, or MUI's
+   ToggleButtonGroup theme) — which isn't ideal long-term.
+   ========================================================= */

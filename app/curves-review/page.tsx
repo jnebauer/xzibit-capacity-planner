@@ -6,9 +6,7 @@ import {
   Alert,
   Box,
   Button,
-  Chip,
   CircularProgress,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -33,6 +31,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import {
+  CHART_GRID,
+  CHART_AXIS_TEXT,
+  CHART_TOOLTIP_STYLE,
+  CHART_TOOLTIP_LABEL_STYLE,
+  CHART_BRAND_STROKE,
+} from '@/lib/chartTokens';
 
 type CurveStatus = 'Draft' | 'Active' | 'Archived';
 type StatusFilter = 'All' | CurveStatus;
@@ -66,11 +71,24 @@ interface CurvesResponse {
   total: number;
 }
 
-const STATUS_COLOR: Record<string, 'warning' | 'success' | 'default'> = {
-  Draft: 'warning',
-  Active: 'success',
-  Archived: 'default',
-};
+// Curve status → standard .pill variant. Mapping per audit §7:
+//   Draft    → pill--sky   (pencilled / not yet live)
+//   Active   → pill--mint  (confirmed / live)
+//   Archived → pill--muted (historical; composed locally in
+//                           app/local.css — the standard's
+//                           six-pastel family has no neutral)
+function statusPillClass(status: string): string {
+  switch (status) {
+    case 'Active':
+      return 'pill pill--mint';
+    case 'Draft':
+      return 'pill pill--sky';
+    case 'Archived':
+      return 'pill pill--muted';
+    default:
+      return 'pill pill--muted';
+  }
+}
 
 async function fetchCurves(): Promise<CurvesResponse> {
   const res = await fetch('/api/curves', { cache: 'no-store' });
@@ -122,24 +140,20 @@ export default function CurveReviewPage() {
 
   if (isLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 6, textAlign: 'center' }}>
+      <Box sx={{ py: 6, textAlign: 'center' }}>
         <CircularProgress />
-      </Container>
+      </Box>
     );
   }
 
   if (error) {
-    return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">{(error as Error).message}</Alert>
-      </Container>
-    );
+    return <Alert severity="error">{(error as Error).message}</Alert>;
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-        <Typography variant="h4">Curve Review</Typography>
+        <Typography variant="h4">Curve review</Typography>
         <Typography variant="body2" color="text.secondary">
           {data?.total ?? 0} total · {counts.Draft ?? 0} Draft · {counts.Active ?? 0} Active ·{' '}
           {counts.Archived ?? 0} Archived
@@ -166,11 +180,29 @@ export default function CurveReviewPage() {
         <ToggleButton value="Archived">Archived</ToggleButton>
       </ToggleButtonGroup>
 
-      <Paper variant="outlined">
+      <Paper
+        variant="outlined"
+        sx={{
+          overflow: 'hidden',
+          '& .MuiTableHead-root .MuiTableCell-root': {
+            backgroundColor: 'var(--xz-surface-soft)',
+            color: 'var(--xz-ink-500)',
+            fontWeight: 600,
+            fontSize: 12,
+            borderBottom: '1px solid var(--xz-hairline)',
+          },
+          '& .MuiTableCell-root': {
+            borderBottomColor: 'var(--xz-hairline-soft)',
+          },
+          '& .MuiTableBody-root .MuiTableRow-root:hover': {
+            backgroundColor: 'var(--xz-surface-soft)',
+          },
+        }}
+      >
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Job Type</TableCell>
+              <TableCell>Job type</TableCell>
               <TableCell>Task</TableCell>
               <TableCell>Curve ID</TableCell>
               <TableCell>Version</TableCell>
@@ -189,11 +221,9 @@ export default function CurveReviewPage() {
                 </TableCell>
                 <TableCell>{curve.version}</TableCell>
                 <TableCell>
-                  <Chip
-                    label={curve.curveStatus}
-                    color={STATUS_COLOR[curve.curveStatus] ?? 'default'}
-                    size="small"
-                  />
+                  <span className={statusPillClass(curve.curveStatus)}>
+                    {curve.curveStatus}
+                  </span>
                 </TableCell>
                 <TableCell>{curve.isRegistryDefault ? 'Yes' : '—'}</TableCell>
                 <TableCell align="right">
@@ -223,7 +253,7 @@ export default function CurveReviewPage() {
         busy={mutation.isPending}
         errorMessage={mutation.error ? (mutation.error as Error).message : null}
       />
-    </Container>
+    </>
   );
 }
 
@@ -269,11 +299,9 @@ function CurveDetailDialog({
           <Typography variant="h6" component="span">
             {curve.jobType} · {curve.taskType}
           </Typography>
-          <Chip
-            label={curve.curveStatus}
-            size="small"
-            color={STATUS_COLOR[curve.curveStatus] ?? 'default'}
-          />
+          <span className={statusPillClass(curve.curveStatus)}>
+            {curve.curveStatus}
+          </span>
         </Stack>
         <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 0.5 }}>
           {curve.curveId} · {curve.version}
@@ -283,14 +311,42 @@ function CurveDetailDialog({
         <Box sx={{ height: 280, mt: 1, mb: 2 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
               <XAxis
                 dataKey="progress"
-                label={{ value: 'Project progress %', position: 'insideBottom', offset: -8 }}
+                stroke={CHART_AXIS_TEXT}
+                tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
+                label={{
+                  value: 'Project progress %',
+                  position: 'insideBottom',
+                  offset: -8,
+                  fill: CHART_AXIS_TEXT,
+                  fontSize: 12,
+                }}
               />
-              <YAxis label={{ value: 'Intensity', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="intensity" stroke="#764ba2" strokeWidth={3} dot={false} />
+              <YAxis
+                stroke={CHART_AXIS_TEXT}
+                tick={{ fill: CHART_AXIS_TEXT, fontSize: 12 }}
+                label={{
+                  value: 'Intensity',
+                  angle: -90,
+                  position: 'insideLeft',
+                  fill: CHART_AXIS_TEXT,
+                  fontSize: 12,
+                }}
+              />
+              <Tooltip
+                contentStyle={CHART_TOOLTIP_STYLE}
+                labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                cursor={{ stroke: CHART_GRID }}
+              />
+              <Line
+                type="monotone"
+                dataKey="intensity"
+                stroke={CHART_BRAND_STROKE}
+                strokeWidth={3}
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </Box>
@@ -322,13 +378,21 @@ function CurveDetailDialog({
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
         {curve.curveStatus !== 'Archived' && (
-          <Button onClick={() => onStatusChange('Archived')} disabled={busy} color="inherit">
+          <Button
+            onClick={() => onStatusChange('Archived')}
+            disabled={busy}
+            variant="outlined"
+          >
             Archive
           </Button>
         )}
         {curve.curveStatus !== 'Draft' && (
-          <Button onClick={() => onStatusChange('Draft')} disabled={busy}>
-            Mark Draft
+          <Button
+            onClick={() => onStatusChange('Draft')}
+            disabled={busy}
+            variant="outlined"
+          >
+            Mark draft
           </Button>
         )}
         {curve.curveStatus !== 'Active' && (
@@ -336,7 +400,7 @@ function CurveDetailDialog({
             onClick={() => onStatusChange('Active')}
             disabled={busy}
             variant="contained"
-            color="success"
+            color="primary"
           >
             Activate
           </Button>
