@@ -814,7 +814,7 @@ export default function JobData() {
             </Box>
           </Box>
           
-          <Box sx={{ height: "calc(100vh - 400px)", width: "100%" }}>
+          <Box sx={{ height: "calc(100vh - 400px)", minHeight: 400, width: "100%", minWidth: 400 }}>
             <DataGrid
               rows={rows}
               columns={columns}

@@ -693,7 +693,7 @@ export default function Employees() {
             </Button>
           </Box>
 
-          <Box sx={{ height: "calc(100vh - 300px)", width: "100%" }}>
+          <Box sx={{ height: "calc(100vh - 300px)", minHeight: 400, width: "100%", minWidth: 400 }}>
             <DataGrid
               rows={rows}
               columns={columns}
