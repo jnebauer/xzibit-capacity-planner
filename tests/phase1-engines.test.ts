@@ -265,6 +265,24 @@ describe('calculateProjectDemand — warnings', () => {
     expect(result.warnings).toContain('missing_truck_date');
   });
 
+  it('emits ambiguous_probability when probabilityWasAmbiguous is true', () => {
+    const project: PlanningProject = {
+      id: 'p-ambiguous',
+      jobNumber: 'J-AMB',
+      jobName: 'Ambiguous prob',
+      jobType: 'Custom Build',
+      probability: 1,
+      probabilityWasAmbiguous: true,
+      workshopStartDate: new Date('2026-01-05'),
+      weeksInWorkshop: 4,
+      truckLoadDate: new Date('2026-01-26'),
+      onsiteWeeks: 1,
+      cnc: 0, build: 100, paint: 0, av: 0, packAndLoad: 0, tradeOnsite: 0,
+    };
+    const result = calculateProjectDemand(project, cache, weeks);
+    expect(result.warnings).toContain('ambiguous_probability');
+  });
+
   it('emits job_type_missing when jobType is null', () => {
     const project: PlanningProject = {
       id: 'p2',

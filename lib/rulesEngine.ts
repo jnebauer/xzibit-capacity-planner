@@ -234,7 +234,7 @@ export function calculateProjectDemand(
     );
     if (!hasAnyCurve) warnings.push('job_type_no_curves');
   }
-  if (project.probabilityWasCoerced === false && (project.raw?.probability === 1 || project.raw?.probability === '1')) {
+  if (project.probabilityWasAmbiguous) {
     warnings.push('ambiguous_probability');
   }
 

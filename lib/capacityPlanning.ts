@@ -55,6 +55,7 @@ export interface PlanningProject {
   truckLoadDate: Date | null;
   truckLoadDateConfidence?: TruckLoadDateConfidence;
   probabilityWasCoerced?: boolean;
+  probabilityWasAmbiguous?: boolean;
   onsiteWeeks: number;
   cnc: number;
   build: number;
@@ -330,7 +331,7 @@ export function normalizeProjectRow(
 
   // probability normalisation
   const probRaw = row.probability ?? row.probabilityRaw ?? 0;
-  const { value: probability, wasCoerced: probabilityWasCoerced } = normaliseProbability(
+  const { value: probability, wasCoerced: probabilityWasCoerced, wasAmbiguous: probabilityWasAmbiguous } = normaliseProbability(
     probRaw as number | string | null
   );
 
@@ -341,6 +342,7 @@ export function normalizeProjectRow(
     jobType: jobTypeName,
     probability,
     probabilityWasCoerced,
+    probabilityWasAmbiguous,
     workshopStartDate: deriveWorkshopStartDateFromRow(row),
     weeksInWorkshop,
     truckLoadDate,
