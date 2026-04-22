@@ -4,16 +4,17 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-const NAV_ITEMS: ReadonlyArray<{ label: string; href: string }> = [
+const NAV_ITEMS: ReadonlyArray<{ label: string; href: string; adminOnly?: boolean }> = [
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Job Data', href: '/job-data' },
   { label: 'Employees', href: '/employees' },
   { label: 'Job Types', href: '/job-types' },
   { label: 'Curve Review', href: '/curves-review' },
   { label: 'Curves Explainer', href: '/curves-explainer' },
+  { label: 'Closures', href: '/closures-admin', adminOnly: true },
 ];
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children, isAdmin = false }: { children: ReactNode; isAdmin?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -30,7 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <div className="side-group-label">Planning</div>
         <nav className="side-nav" aria-label="Primary">
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => {
             const active = pathname === item.href;
             return (
               <Link

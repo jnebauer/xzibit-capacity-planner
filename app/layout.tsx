@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import "./local.css";
 import { QueryProvider } from "../components/QueryProvider";
@@ -13,17 +14,20 @@ export const metadata: Metadata = {
   description: "Capacity planning and resource management system",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const isAdmin = headersList.get("x-is-admin") === "true";
+
   return (
     <html lang="en">
       <body className={inter.className}>
         <ThemeRegistry fontFamily={inter.style.fontFamily}>
           <QueryProvider>
-            <AppShell>{children}</AppShell>
+            <AppShell isAdmin={isAdmin}>{children}</AppShell>
           </QueryProvider>
         </ThemeRegistry>
       </body>
