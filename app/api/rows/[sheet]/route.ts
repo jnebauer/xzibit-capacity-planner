@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAuth } from '@/lib/auth';
+import { verifyAuth, verifyAdmin } from '@/lib/auth';
 import { supabase, toRow } from '@/lib/supabase';
 import { z } from 'zod';
 
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ she
 }
 
 export async function POST(request: NextRequest, context: { params: Promise<{ sheet: string }> }) {
-  const auth = await verifyAuth(request);
+  const auth = await verifyAdmin(request);
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const { sheet } = await context.params;
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ sh
 }
 
 export async function PATCH(request: NextRequest, context: { params: Promise<{ sheet: string }> }) {
-  const auth = await verifyAuth(request);
+  const auth = await verifyAdmin(request);
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const { sheet } = await context.params;
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ s
 }
 
 export async function DELETE(request: NextRequest, context: { params: Promise<{ sheet: string }> }) {
-  const auth = await verifyAuth(request);
+  const auth = await verifyAdmin(request);
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const { sheet } = await context.params;
