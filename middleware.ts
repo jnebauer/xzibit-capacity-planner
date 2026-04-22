@@ -29,15 +29,6 @@ function decodeJwt(token: string) {
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
-  // Skip API routes and static files
-  if (
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/favicon.ico')
-  ) {
-    return NextResponse.next();
-  }
-
   // DEVELOPMENT MODE: Skip authentication for local testing
   if (process.env.NODE_ENV === 'development') {
     console.log('🔓 Development mode - authentication bypassed');
@@ -132,5 +123,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
